@@ -80,6 +80,16 @@ export const createDBUser =  ({ avatar = null , content = null , uid, username, 
   });
 }
 
+export const unregisterUser = (uid, gameid) => {
+  var userRef = dbService.collection('users').doc(uid);
+
+  return userRef.set({
+      cod: null,
+      gameid: null,
+      previousGameid: gameid
+  }, { merge: true });
+}
+
 const getDBUser =  (uid) => {
   return dbService
     .collection("users")

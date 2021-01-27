@@ -43,9 +43,9 @@ const Hero = ({
   const [registroModalActive, setRegistroModalActive] = useState(false);
   const [registroValue, setRegistroValue] = useState("");
   const [resgistroResults, setResgistroResults] = useState([]);
-  const [selectValue, setSelectValue] = useState("");
+  const [registroError, setRegistroError] = useState(false);
   const [logged, setLogged] = useState(undefined);
-
+  const [loading, setLoading] = useState(false);
 
   const openModal = (e) => {
     e.preventDefault();
@@ -62,6 +62,7 @@ const Hero = ({
     setRegistroModalActive(false);
     setRegistroValue("");
     setResgistroResults([]);
+    setLoading(false);
   };
 
   const handleRegistro = () => {
@@ -75,36 +76,57 @@ const Hero = ({
     e && e.target && setRegistroValue(e.target.value);
   };
 
-  const handleRegistroSubmit = (e) => {
-    e.preventDefault();
-    console.log("ddd", registroValue);
-    codTournamentService.getUserDetails(registroValue).then((result) => {
-      if (result.length > 1) {
-        setResgistroResults(result);
-      } else if (result.length === 1) {
-        const { username } = result[0];
-        codTournamentService.getUserStats(username).then((stats) => {
-          console.log("stats", stats);
-          const { kdRatio, deaths, kills, wins } = stats.wz.br_all.properties;
-          const newlogged = { ...result[0], kdRatio, deaths, kills, wins };
-          setLogged(newlogged);
-          console.log("newlogged", newlogged);
-        });
-      }
+  const handleRegistroClick = (e) => {
+    console.log("clicket");
+  };
+
+  const checkUser = (user) => {
+    setLoading(true);
+    const { username } = user;
+    return codTournamentService.getUserStats(username).then((stats) => {
+      console.log("stats", stats);
+      const { kdRatio, deaths, kills, wins } = stats.wz.br_all.properties;
+      const newlogged = { ...user, kdRatio, deaths, kills, wins };
+      setLogged(newlogged);
+      setResgistroResults([]);
+      setLoading(false);
+      console.log("newlogged", newlogged);
     });
+  };
+
+  const handleRegistroSubmit = (e) => {
+    e && e.preventDefault();
+    console.log("ddd", registroValue);
+    setLoading(true);
+    codTournamentService
+      .getUserDetails(registroValue)
+      .then((result) => {
+        if (result.length === 0) {
+          setRegistroError(true)
+        } else if (result.length > 1) {
+          setResgistroResults(result);
+          console.log("result", result);
+          console.log("resgistroResults", resgistroResults);
+        } else if (result.length === 1) {
+          const user = result[0];
+          checkUser(user).then(() => {});
+        }
+        setLoading(false);
+      })
+      .catch((e) => {
+        console.log("error");
+      });
     setRegistroValue("");
   };
 
-  const handleSelectedUser = (e) => {
-    console.log("yessss", e.target.value);
-    console.log("yessss", selectValue);
-    setSelectValue(e.target.value);
-    setRegistroValue(e.target.value);
+  const handleSelectedUser = (user, e) => (e) => {
+    console.log("yessss", e);
+    console.log("yessss", user);
+    checkUser(user);
   };
 
   const handleSubmitResults = (e) => {
     console.log("yessss", e);
-    console.log("yessss", selectValue);
   };
 
   const handleConfirm = () => {
@@ -192,103 +214,117 @@ const Hero = ({
               )}
             </div>
           </div>
-          {/* <div className="hero-figure reveal-from-bottom illustration-element-01" data-reveal-value="20px" data-reveal-delay="800">
-            <a
-              data-video="https://player.vimeo.com/video/174002812"
-              href="#0"
-              aria-controls="video-modal"
-              onClick={openModal}
-            >
-              <Image
-                className="has-shadow"
-                src={require('./../../assets/images/video-placeholder.jpg')}
-                alt="Hero"
-                width={896}
-                height={504} />
-            </a>
-          </div> */}
-          {/* <Modal
-            id="video-modal"
-            show={videoModalActive}
-            handleClose={closeModal}
-            video="https://player.vimeo.com/video/174002812"
-            videoTag="iframe" /> */}
           <Modal show={registroModalActive} handleClose={closeRegistroModal}>
-            {!logged ? (
-              <div>
-                <div className="features-tiles-item-content">
-                  <h4 className="mt-0 mb-8">Registro</h4>
-                  <p className="mb-16 text-sm">
-                    Vamos a buscar tu usuario en{" "}
-                    <strong>https://my.callofduty.com/</strong>
-                  </p>
-                </div>
-                <form onSubmit={handleRegistroSubmit}>
-                  <Input
-                    id="newsletter"
-                    // type="email"
-                    label="Registro"
-                    labelHidden
-                    hasIcon="right"
-                    placeholder="GAMER ID"
-                    value={registroValue}
-                    onChange={handleRegistroChange}
-                    // onKeyPress={handleRegistroEnter}
-                  >
-                    <svg
-                      width="16"
-                      height="12"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M9 5H1c-.6 0-1 .4-1 1s.4 1 1 1h8v5l7-6-7-6v5z"
-                        fill="#376DF9"
-                      />
-                    </svg>
-                  </Input>
-                  {resgistroResults.length > 0 && (
-                    <Select
-                      className="mt-0 mb-8"
-                      value={selectValue}
-                      onClick={handleSelectedUser}
-                    >
-                      {resgistroResults.map((elem) => (
-                        <option key={elem.accountId} value={elem.username}>
-                          {elem.username}
-                        </option>
-                      ))}
-                    </Select>
-                  )}
-                </form>
-              </div>
+            {loading ? (
+              <img src="/spinner.gif" />
             ) : (
-              <div className="">
-                <p className="mb-8 ">¿Quieres confirmar este usuario?</p>
-                <strong>Solo prodrás acceder a los torneos con él</strong>
-                <h3 className="mt-16 mb-0 text-color-secondary has-bottom-divider">
-                  {logged.username}
-                </h3>
-                <ButtonGroup>
-                  <Button
-                    tag="a"
-                    color="primary"
-                    size="sm"
-                    onClick={handleConfirm}
-                    wideMobile
-                  >
-                    Confirmar
-                  </Button>
-                  <Button
-                    tag="a"
-                    size="sm"
-                    color="error"
-                    onClick={handleCancel}
-                    wideMobile
-                  >
-                    Cancelar
-                  </Button>
-                </ButtonGroup>
-              </div>
+              <>
+                {!logged ? (
+                  <div>
+                    <div className="features-tiles-item-content">
+                      <h4 className="mt-0 mb-8">Registro</h4>
+                      <p className="mb-16 text-sm">
+                        Vamos a buscar tu usuario en{" "}
+                        <strong>https://my.callofduty.com/</strong>
+                      </p>
+                      {
+                        registroError && (
+                          <p className="text-color-error"> No se encontró el usuario</p>
+                        )
+                      }
+                    </div>
+                    <form onSubmit={handleRegistroSubmit}>
+                      {resgistroResults.length === 0 && (
+                        <>
+                          <Input
+                            id="newsletter"
+                            type="search"
+                            label="Registro"
+                            labelHidden
+                            hasIcon="right"
+                            placeholder="GAMER ID"
+                            value={registroValue}
+                            onChange={handleRegistroChange}
+                            // onKeyPress={handleRegistroEnter}
+                          >
+                            <svg
+                              className="text-color-primary"
+                              height="21"
+                              viewBox="0 0 21 21"
+                              width="21"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <g
+                                fill="none"
+                                fill-rule="evenodd"
+                                stroke="#5658DD"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              >
+                                <circle cx="8.5" cy="8.5" r="5" />
+                                <path d="m17.571 17.5-5.571-5.5" />
+                              </g>
+                            </svg>
+                          </Input>
+                          <Button
+                            className="mt-16"
+                            tag="a"
+                            color="primary"
+                            onClick={handleRegistroSubmit}
+                            wideMobile
+                          >
+                            Buscar
+                          </Button>
+                        </>
+                      )}
+                      <ul>
+                        {resgistroResults.length > 1 &&
+                          resgistroResults.map((user) => (
+                            <li
+                              className="ta-l has-bg-color"
+                              onClick={handleSelectedUser(user)}
+                            >
+                              <p className="text-color-low mb-0 ml-8 ">
+                                {user.username}
+                              </p>
+                            </li>
+                          ))}
+                      </ul>
+                    </form>
+                  </div>
+                ) : (
+                  <div className="">
+                    <p className="mb-8 ">¿Quieres confirmar este usuario?</p>
+                    <strong>Solo prodrás acceder a los torneos con él</strong>
+                    <h3 className="mt-16 mb-0 text-color-secondary has-bottom-divider">
+                      {logged.username}
+                    </h3>
+                    <h4 className="mt-0 mb-8 text-color-ligt">
+                      K/D: {Math.floor(logged.kdRatio * 100) / 100}
+                    </h4>
+                    <ButtonGroup className="mt-8">
+                      <Button
+                        tag="a"
+                        color="primary"
+                        size="sm"
+                        onClick={handleConfirm}
+                        wideMobile
+                      >
+                        Confirmar
+                      </Button>
+                      <Button
+                        tag="a"
+                        size="sm"
+                        color="error"
+                        onClick={handleCancel}
+                        wideMobile
+                      >
+                        Cancelar
+                      </Button>
+                    </ButtonGroup>
+                  </div>
+                )}
+              </>
             )}
           </Modal>
         </div>

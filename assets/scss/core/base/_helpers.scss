@@ -103,6 +103,15 @@
 	text-transform: uppercase;
 }
 
+.tt-underline {
+	text-decoration: underline;
+	
+}
+
+.tt-underline:hover {
+	cursor: pointer;
+}
+
 // Images
 .image-full {
 	width: 100%;
@@ -326,6 +335,10 @@ img.has-shadow {
 
 .ml-32 {
 	margin-left: 32px;
+}
+
+.ml-64 {
+	margin-left: 64px;
 }
 
 // Spacing, padding
@@ -564,6 +577,10 @@ img.has-shadow {
 		padding-top: 64px;
 	}
 	
+	.magin-bottom-8-mobile {
+		margin-bottom: 8px;
+	}
+
 	.magin-top-8-mobile {
 		margin-top: 8px;
 	}
@@ -585,6 +602,10 @@ img.has-shadow {
 
 	.ta-r-desktop {
 		text-align: right;
+	}
+
+	.margin-left-64-desktop {
+		margin-left: 64px;
 	}
 
 	.center-content-desktop {

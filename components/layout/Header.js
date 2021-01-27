@@ -6,6 +6,7 @@ import Logo from "./partials/Logo";
 import Avatar from "../elements/Avatar";
 import { loginWithGoogle, logOutFromGoogle } from "../../firebase/client";
 import useUser from "../../hooks/useUser";
+import { useRouter } from 'next/router'
 import Button from "../elements/Button";
 import { getUserDetails } from "../../services/codtrackerService";
 
@@ -44,7 +45,9 @@ const Header = ({
   const [user, logOut, updateUser] = useUser();
 
   const globalState = useContext(store);
-  const { dispatch } = globalState;
+  const router = useRouter()
+
+  const { dispatch } = globalState; // nota para modificar el stado en el contexto store
 
   const nav = useRef(null);
   const hamburger = useRef(null);
@@ -135,6 +138,11 @@ const Header = ({
     getUserDetailsCT("destrozapanchos2").then(console.log);
   };
 
+  const handleOnUserClick = () => {
+    console.log("Click")
+    router.push("/settings")
+  };
+
   return (
     <header {...props} className={classes}>
       <div className="container">
@@ -149,7 +157,7 @@ const Header = ({
             <>
               <>
                 {user && user.username && (
-                  <div className="header-nav-bar">
+                  <div className="header-nav-bar" onClick={handleOnUserClick}>
                     <Avatar alt={user.username} src={user.avatar} />
                     <div className="header-nav-user">
                       <p className="text-color-primary has-bottom-divider">
@@ -157,14 +165,16 @@ const Header = ({
                       </p>
                       <p className="text-color-secondary">{user.gameid}</p>
                     </div>
-                    <div className="header-nav-kd">
-                      <p className="ml-8 mt-0 mr-16 mb-0 ta-l text-xxs">
-                        K/D
-                        <span className="text-color-high fw-700 ml-8 mt-0 mr-16 mb-0 ta-l has-shadow text-sm">
-                          {Math.floor(user.cod.kdRatio * 100) / 100}
-                        </span>
-                      </p>
-                    </div>
+                    {user.cod && (
+                      <div className="header-nav-kd">
+                        <p className="ml-8 mt-0 mr-16 mb-0 ta-l text-xxs">
+                          K/D
+                          <span className="text-color-high fw-700 ml-8 mt-0 mr-16 mb-0 ta-l has-shadow text-sm">
+                            {Math.floor(user.cod.kdRatio * 100) / 100}
+                          </span>
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
                 <button
