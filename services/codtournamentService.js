@@ -1,5 +1,6 @@
 
-const api_url = "http://localhost:3000/api/";
+// const api_url = "http://localhost:3000/api/";
+const api_url = "https://cod-nextjs.vercel.app/";
 
 export const getUserDetails = (gamerId) => {
   const gameIdEncode = encodeURIComponent(gamerId)
