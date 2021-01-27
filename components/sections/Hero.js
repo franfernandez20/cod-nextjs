@@ -38,7 +38,7 @@ const Hero = ({
 }) => {
   // const [videoModalActive, setVideomodalactive] = useState(false);
 
-  const [user, logOut] = useUser();
+  const [user, logOut, updateUser] = useUser();
 
   const [registroModalActive, setRegistroModalActive] = useState(false);
   const [registroValue, setRegistroValue] = useState("");
@@ -46,14 +46,6 @@ const Hero = ({
   const [selectValue, setSelectValue] = useState("");
   const [logged, setLogged] = useState(undefined);
 
-  useEffect(() => {
-    if (logged)
-      // codTournamentService
-      //   .getUserStats(encodeURIComponent(logged.username))
-      //   .then((result) => {
-      //   });
-        console.log("motherFuckerrr");
-  }, [logged]);
 
   const openModal = (e) => {
     e.preventDefault();
@@ -66,7 +58,7 @@ const Hero = ({
   };
 
   const closeRegistroModal = (e) => {
-    e.preventDefault();
+    e && e.preventDefault();
     setRegistroModalActive(false);
     setRegistroValue("");
     setResgistroResults([]);
@@ -135,6 +127,7 @@ const Hero = ({
       cod: { platform, accountId, gameAvatar, kdRatio, deaths, kills, wins },
     };
     createDBUser(newuser);
+    updateUser(newuser);
     closeRegistroModal();
   };
 
@@ -175,7 +168,7 @@ const Hero = ({
               >
                 Como de bueno eres en WarZone prepara a tu equipo y demostrazlo.
               </p>
-              {user && !user.cod && (
+              {user && user.username && !user.cod && (
                 <div className="reveal-from-bottom" data-reveal-delay="600">
                   <ButtonGroup>
                     <Button
@@ -271,32 +264,30 @@ const Hero = ({
             ) : (
               <div className="">
                 <p className="mb-8 ">¿Quieres confirmar este usuario?</p>
-                <p>
-                  <strong>Solo prodrás acceder a los torneos con él</strong>
-                  <h3 className="mt-16 mb-0 text-color-secondary">
-                    {logged.username}
-                  </h3>
-                  <ButtonGroup>
-                    <Button
-                      tag="a"
-                      color="primary"
-                      size="sm"
-                      onClick={handleConfirm}
-                      wideMobile
-                    >
-                      Confirmar
-                    </Button>
-                    <Button
-                      tag="a"
-                      size="sm"
-                      color="error"
-                      onClick={handleCancel}
-                      wideMobile
-                    >
-                      Cancelar
-                    </Button>
-                  </ButtonGroup>
-                </p>
+                <strong>Solo prodrás acceder a los torneos con él</strong>
+                <h3 className="mt-16 mb-0 text-color-secondary has-bottom-divider">
+                  {logged.username}
+                </h3>
+                <ButtonGroup>
+                  <Button
+                    tag="a"
+                    color="primary"
+                    size="sm"
+                    onClick={handleConfirm}
+                    wideMobile
+                  >
+                    Confirmar
+                  </Button>
+                  <Button
+                    tag="a"
+                    size="sm"
+                    color="error"
+                    onClick={handleCancel}
+                    wideMobile
+                  >
+                    Cancelar
+                  </Button>
+                </ButtonGroup>
               </div>
             )}
           </Modal>

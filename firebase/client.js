@@ -33,7 +33,10 @@ export const onAuthStateChanged = (onChange) => {
       // Comprobar con usuario en db
       getDBUser(normalizedUser.uid).then( (user) =>{
         if (user) onChange(user)
-        else createDBUser(normalizedUser)      
+        else {
+          createDBUser(normalizedUser)      
+          onChange(normalizedUser)
+        }
       })
     } else return null
   });
