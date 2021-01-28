@@ -4,7 +4,7 @@ import classNames from "classnames";
 import Link from "next/link";
 import Logo from "./partials/Logo";
 import Avatar from "../elements/Avatar";
-import { loginWithGoogle, logOutFromGoogle } from "../../firebase/client";
+import { loginWithGoogle, logOutFromGoogle, createTournament } from "../../firebase/client";
 import useUser from "../../hooks/useUser";
 import { useRouter } from 'next/router'
 import Button from "../elements/Button";

@@ -13,7 +13,7 @@ const firebaseConfig = {
 
 !firebase.apps.length && firebase.initializeApp(firebaseConfig);
 
-const dbService = firebase.firestore()
+const dbService = firebase.firestore();
 
 const mapUserFromFirebaseAuthToUser = (user) => {
   const { displayName, email, photoURL, uid } = user;
@@ -31,14 +31,14 @@ export const onAuthStateChanged = (onChange) => {
     if (user) {
       const normalizedUser = user ? mapUserFromFirebaseAuthToUser(user) : null;
       // Comprobar con usuario en db
-      getDBUser(normalizedUser.uid).then( (user) =>{
-        if (user) onChange(user)
+      getDBUser(normalizedUser.uid).then((user) => {
+        if (user) onChange(user);
         else {
-          createDBUser(normalizedUser)      
-          onChange(normalizedUser)
+          createDBUser(normalizedUser);
+          onChange(normalizedUser);
         }
-      })
-    } else return null
+      });
+    } else return null;
   });
 };
 
@@ -53,69 +53,81 @@ export const loginWithGoogle = () => {
 };
 
 export const logOutFromGoogle = () => {
-  return firebase.auth().signOut()
-}
+  return firebase.auth().signOut();
+};
 
-
-export const createDBUser =  ({ avatar = null , content = null , uid, username, gameid=null, cod=null }) => {  
-  return dbService.collection('users').doc(uid).set({
-    avatar,
-    content,
-    uid,
-    username,
-    gameid,
-    createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
-    cod,
-    content: {
-      wallet: 0, //saldo
-      wasted: 0, //dinero gastado
-      lastReward: 0, // ultimo premio a cobrar
-      rewards: 0, // Total premios
-    }
-  }).then(function(a) {
-    console.log("Document successfully written!");
-  })
-  .catch(function(error) {
+export const createDBUser = ({
+  avatar = null,
+  content = null,
+  uid,
+  username,
+  gameid = null,
+  cod = null,
+}) => {
+  return dbService
+    .collection("users")
+    .doc(uid)
+    .set({
+      avatar,
+      content,
+      uid,
+      username,
+      gameid,
+      createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
+      cod,
+      content: {
+        wallet: 0, //saldo
+        wasted: 0, //dinero gastado
+        lastReward: 0, // ultimo premio a cobrar
+        rewards: 0, // Total premios
+      },
+    })
+    .then(function (a) {
+      console.log("Document successfully written!");
+    })
+    .catch(function (error) {
       console.error("Error writing document: ", error);
-  });
-}
+    });
+};
 
 export const unregisterUser = (uid, gameid) => {
-  var userRef = dbService.collection('users').doc(uid);
+  var userRef = dbService.collection("users").doc(uid);
 
-  return userRef.set({
+  return userRef.set(
+    {
       cod: null,
       gameid: null,
-      previousGameid: gameid
-  }, { merge: true });
-}
+      previousGameid: gameid,
+    },
+    { merge: true }
+  );
+};
 
-const getDBUser =  (uid) => {
+const getDBUser = (uid) => {
   return dbService
     .collection("users")
     .doc(uid)
     .get()
-    .then(( doc ) => {
-      console.log('doc', doc)
+    .then((doc) => {
+      console.log("doc", doc);
       if (doc.exists) {
         console.log("Document data:", doc.data());
-        const data = doc.data()
-        const id = doc.id
-        const { createdAt } = data
-    
+        const data = doc.data();
+        const id = doc.id;
+        const { createdAt } = data;
+
         return {
           ...data,
           id,
           createdAt: +createdAt.toDate(),
-        }
-    } else {
+        };
+      } else {
         // doc.data() will be undefined in this case
         console.log("No such document!");
-        return null
-    }
-      
-    }) 
-}
+        return null;
+      }
+    });
+};
 
 export const fetchAllUsers = () => {
   return dbService
@@ -124,15 +136,140 @@ export const fetchAllUsers = () => {
     .get()
     .then(({ docs }) => {
       return docs.map((doc) => {
-        const data = doc.data()
-        const id = doc.id
-        const { createdAt } = data
+        const data = doc.data();
+        const id = doc.id;
+        const { createdAt } = data;
 
         return {
           ...data,
           id,
           createdAt: +createdAt.toDate(),
-        }
-      })
+        };
+      });
+    });
+};
+
+const torn1 = {
+  fecha: firebase.firestore.Timestamp.fromDate(new Date("2021/02/14 17:00:00")),
+  visible: true,
+  kdmax: 2.0,
+  prize: 5,
+  modo: "Tríos",
+  format: "Standar",
+  mapa: "Verdansk",
+  region: "UE",
+  payed: [],
+  topay: [],
+};
+const torn2 = {
+  fecha: firebase.firestore.Timestamp.fromDate(new Date("2021/02/21 17:00:00")),
+  visible: true,
+  kdmax: 2.0,
+  prize: 5,
+  modo: "Tríos",
+  format: "Standar",
+  mapa: "Verdansk",
+  region: "UE",
+  payed: [],
+  topay: [],
+};
+const torn3 = {
+  fecha: firebase.firestore.Timestamp.fromDate(new Date("2021/02/28 17:00:00")),
+  visible: true,
+  kdmax: 2.0,
+  prize: 5,
+  modo: "Tríos",
+  format: "Standar",
+  mapa: "Verdansk",
+  region: "UE",
+  payed: [],
+  topay: [],
+};
+
+const createTournament = () => {
+  return dbService
+    .collection("tournament")
+    .add(torn3)
+    .then(function (docRef) {
+      console.log("Document written with ID: ", docRef.id);
     })
-}
+    .catch(function (error) {
+      console.error("Error adding document: ", error);
+    });
+};
+
+export const fetchAllTournaments = () => {
+  return dbService
+    .collection("tournament")
+    .orderBy("fecha", "asc")
+    .get()
+    .then(({ docs }) => {
+      return docs.map((doc) => {
+        const data = doc.data();
+        const id = doc.id;
+        const { fecha } = data;
+
+        return {
+          ...data,
+          id,
+          fecha: +fecha.toDate(),
+        };
+      });
+    });
+};
+
+export const inscribeUserToTournament = (uid, tournament) => {
+  const { id: tid, topay } = tournament;
+  if (topay.includes(uid)) return
+  var tournamentRef = dbService.collection("tournament").doc(tid);
+
+  return tournamentRef
+    .update({
+      topay: firebase.firestore.FieldValue.arrayUnion(uid),
+      totalTopay: firebase.firestore.FieldValue.increment(1),
+    })
+    .then(() => {
+      var userRef = dbService.collection("users").doc(uid);
+      userRef
+        .update({
+          tournaments: firebase.firestore.FieldValue.arrayUnion({
+            tid,
+            payed: false,
+          }),
+        })
+        .catch((e) => {
+          console.log("Error guardando el torneo en el user", e);
+        });
+    })
+    .catch((e) => {
+      console.log("Error guardando el user en el torneo", e);
+    });
+};
+
+export const deleteUserToTournament = (uid, tournament) => {
+  const { id: tid, topay } = tournament;
+  if (!topay.includes(uid)) return
+  var tournamentRef = dbService.collection("tournament").doc(tid);
+
+  return tournamentRef
+    .update({
+      topay: firebase.firestore.FieldValue.arrayRemove(uid),
+      totalTopay: firebase.firestore.FieldValue.increment(-1),
+    })
+    .then(() => {
+      var userRef = dbService.collection("users").doc(uid);
+      userRef
+        .update({
+          tournaments: firebase.firestore.FieldValue.arrayRemove({
+            tid,
+            payed: false,
+          }),
+        })
+        .catch((e) => {
+          console.log("Error guardando el torneo en el user", e);
+        });
+    })
+    .catch((e) => {
+      console.log("Error guardando el user en el torneo", e);
+    });
+};

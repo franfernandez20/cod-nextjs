@@ -74,3 +74,25 @@
 		}
 	}
 }
+
+
+/// Tournaments page
+
+.tournaments {
+
+	.section-inner {
+		padding-top: 20px;
+		padding-bottom: $hero--padding-b__mobile;
+
+	}
+
+	.heading {
+		margin-bottom: 30px;
+	}
+
+	.borrarme-section {
+		display: flex;
+		align-items: baseline;
+		justify-content: center;
+	}
+}

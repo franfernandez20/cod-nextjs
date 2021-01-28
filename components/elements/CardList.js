@@ -26,7 +26,7 @@ const torneos = [
   },
 ];
 
-export default function CardList({ alt, src, text }) {
+export default function CardList({ alt, src, text, list }) {
   return (
     // <div class="doughnut-component">
     //     <div class="doughnut__wrapper">
@@ -39,24 +39,14 @@ export default function CardList({ alt, src, text }) {
     //         <div class="stat-summary-chart__label">Prop. B/M</div>
     //     </div>
     // </div>
-    <section className='dale_padding'>
+    <section className="dale_padding">
       <div className="player-page main-content-inner inner-wrapper">
         <div className="recent-matches-container">
           <div className="recentmatches-page">
             <div className="page-wrapper recentmatches-last-matches">
               <div className="page-wrapper recentmatches-last-matches">
                 <ul className="recentmatches-listing card_basic">
-                  {
-                      torneos && torneos.map((torneo) =>
-                          <Card
-                              type={torneo.type}
-                              kd={torneo.kd}
-                              inscripcion={torneo.inscripcion}
-                              fecha={torneo.fecha}
-                              mapa={torneo.mapa}
-                          />
-                      )
-                  }
+                  {list && list.map((tournament) => <Card tournament={tournament} />)}
                 </ul>
               </div>
             </div>

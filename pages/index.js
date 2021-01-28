@@ -1,30 +1,43 @@
-import Head from 'next/head'
-import Layout, { siteTitle } from '../components_old/layout'
-import utilStyles from '../styles/utils.module.css'
-import { getSortedPostsData } from '../lib/posts'
-import Link from 'next/link'
-import Date from '../components_old/date'
+import Head from "next/head";
+import Layout, { siteTitle } from "../components_old/layout";
+import utilStyles from "../styles/utils.module.css";
+import { getSortedPostsData } from "../lib/posts";
+import Link from "next/link";
+import Date from "../components_old/date";
 
-import Hero from '../components/sections/Hero'
-import CardList from '../components/elements/CardList'
-import Testimonial from '../components/sections/Testimonial'
-import Cta from '../components/sections/Cta';
+import Hero from "../components/sections/Hero";
+import CardList from "../components/elements/CardList";
+import Testimonial from "../components/sections/Testimonial";
+import Cta from "../components/sections/Cta";
 
-export async function getStaticProps() {
-  const allPostsData = getSortedPostsData()
+import { fetchAllTournaments } from "../firebase/client";
+
+// export async function getStaticProps() {
+//   const allPostsData = getSortedPostsData();
+//   return {
+//     props: {
+//       allPostsData,
+//     },
+//   };
+// }
+
+export async function getServerSideProps(context) {
+  const tournaments = await fetchAllTournaments()
+  console.log('tournaments', tournaments)
+  
   return {
     props: {
-      allPostsData
-    }
-  }
+      tournaments
+    }, // will be passed to the page component as props
+  };
 }
 
-export default function Home({allPostsData}) {
+export default function Home({ allPostsData, tournaments }) {
   return (
     <>
       <Hero className="illustration-section-01" />
-      <CardList/>
-      <Testimonial topDivider />
+      <CardList list={tournaments} />
+      {/* <Testimonial topDivider /> */}
       {/* <Cta split /> */}
     </>
     // <Layout home>
@@ -56,5 +69,5 @@ export default function Home({allPostsData}) {
     //     </ul>
     //   </section>
     // </Layout>
-  )
+  );
 }

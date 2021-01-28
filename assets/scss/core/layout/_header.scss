@@ -27,6 +27,10 @@
 		display: flex;
 	}
 
+	.header-nav-bar:hover {
+		cursor: pointer;
+	}
+
 	.header-nav-user {
 		display: inline;
 
@@ -191,4 +195,9 @@
 	.header-nav-right-kd {
 		display: none;
 	}
+}
+
+.back-foto {
+	// background-image: url(../../../images/cod/friends-feed-bg-texture-2x2.png);
+	background-image: url(../../../../public/images/s1-wz-rebirth.jpg);
 }

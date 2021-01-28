@@ -72,6 +72,12 @@
 	height: $button-form-sm--height;
 }
 
+.button-xxs {
+    padding: 7px 13px;
+	height: 30px;
+	line-height: 15px;
+}
+
 .button-dark {
 	color: color(button-dark);
     background-color: color-bg(button-dark);
