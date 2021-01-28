@@ -60,21 +60,13 @@ export default function Tournaments({
 
   const topDivider = true;
 
-  const {
-    tournament: {
-      id = undefined,
-      fecha = undefined,
-      kdmax = undefined,
-      prize = undefined,
-      modo = undefined,
-      format = undefined,
-      mapa = undefined,
-      region,
-    },
-  } = state;
+  const { tournament } = state;
 
   useEffect(() => {
-    if (user && user.tournaments.filter((e) => e.tid === id).length > 0)
+    if (
+      user &&
+      user.tournaments.filter((e) => e.tid === tournament.id).length > 0
+    )
       setInscripcionDone(true);
   }, []);
 
@@ -95,7 +87,7 @@ export default function Tournaments({
 
   const handleConfirm = (e) => {
     e.preventDefault();
-    inscribeUserToTournament(user.id, state.tournament).then(() => {
+    inscribeUserToTournament(user.id, tournament).then(() => {
       setInscripcionDone(true);
     });
   };
@@ -106,7 +98,7 @@ export default function Tournaments({
 
   const handleDelete = (e) => {
     e.preventDefault();
-    deleteUserToTournament(user.id, state.tournament);
+    deleteUserToTournament(user.id, tournament);
     setInscripcionDone(false);
     dispatch({ type: "tournament-deleteUser", value: user.id });
     router.push("/");
@@ -150,7 +142,7 @@ export default function Tournaments({
               data-reveal-delay="200"
             >
               <span className="text-color-primary">
-                {diaSemana[new Date(fecha).getDay()]}
+                {diaSemana[new Date(tournament.fecha).getDay()]}
               </span>
             </h2>
             <h3
@@ -158,11 +150,11 @@ export default function Tournaments({
               data-reveal-delay="200"
             >
               <span className="text-color-low">
-                {new Date(fecha).toLocaleDateString()}
+                {new Date(tournament.fecha).toLocaleDateString()}
               </span>
               <span className="text-color-primary"> | </span>
               <span className="text-color-high">
-                {new Date(fecha).toLocaleTimeString()}
+                {new Date(tournament.fecha).toLocaleTimeString()}
               </span>
             </h3>
             <div className="container-xs">
@@ -183,8 +175,8 @@ export default function Tournaments({
                   </div>
                   <h4 className="mt-8">
                     Pago confirmado:
-                    {user.tournaments.includes(id) &&
-                    user.tournaments.find((e) => e.tid === id).payed
+                    {user.tournaments.includes(tournament.id) &&
+                    user.tournaments.find((e) => e.tid === tournament.id).payed
                       ? " SI"
                       : " NO"}
                   </h4>
@@ -269,9 +261,12 @@ export default function Tournaments({
                 <div className="text-xxs text-color-primary fw-600 tt-u mb-8">
                   Descripción del evento
                 </div>
-                <h3 className="mt-0 mb-12">
-                  {mapa} | {modo} | k/d max: {kdmax}{" "}
-                </h3>
+                {tournament && (
+                  <h3 className="mt-0 mb-12">
+                    {tournament.mapa} | {tournament.modo} | k/d max:{" "}
+                    {tournament.kdmax}{" "}
+                  </h3>
+                )}
                 <p className="m-0">
                   Estas partidas, ganarán 1 punto por eliminación; con 20 puntos
                   por una victoria, 15 por los 5 primeros, 10 por los 15 primero
