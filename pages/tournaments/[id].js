@@ -57,9 +57,6 @@ export default function Tournaments({
   console.log("state", state);
 
   const validUser = user && user.username && user.cod;
-  const incribedUser = () =>
-    user && user.tournaments.filter((e) => e.tid === id).length > 0;
-  console.log("id", id);
 
   const topDivider = true;
 
