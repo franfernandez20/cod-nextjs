@@ -34,6 +34,18 @@
 	.header-nav-user {
 		display: inline;
 
+		.header-nav-user-game {
+			display: flex;
+
+			.psn-icon {
+				height: 1.5rem;
+				width: 1.5rem;
+				margin-right: .75rem;
+				fill: #FFFFFF
+			}
+		}
+		
+
 		p {
 			margin-left: 0px;
 			margin-top: 0;

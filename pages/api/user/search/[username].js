@@ -2,9 +2,10 @@ import { XSRF_TOKEN } from '../../../../lib/api'
 
 export default function handler(req, res) {
   const {
-    query: { username },
+    query: { username, platform },
   } = req;
-
+  
+  if (!platform) return res.end('Error - platform es necesario')
   var myHeaders = new Headers();
   myHeaders.append(
     "Cookie",
@@ -18,18 +19,25 @@ export default function handler(req, res) {
   };
 
   fetch(
-    `https://my.callofduty.com/api/papi-client/crm/cod/v2/platform/uno/username/${username}/search`,
+    `https://my.callofduty.com/api/papi-client/crm/cod/v2/platform/${platform}/username/${username}/search`,
     requestOptions
   )
-    .then((response) => response.text())
+    .then((response) => response.json())
     .then((result) => {
-      res.statusCode = 200;
-      res.setHeader('Content-Type', 'application/json');
-      res.end(result);
+      console.log('result', result)
+      const { status, data } = result
+      console.log('status', status)
+      if (status === 'success') {
+        console.log('entra')
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(data));
+      }
     })
     .catch(error => {
+      console.log('error', error)
       res.json(error);
       res.status(405).end();
-      return resolve(); //in case something goes wrong in the catch block
+      return res.end(JSON.stringify('mierda')); //in case something goes wrong in the catch block
     });
 }

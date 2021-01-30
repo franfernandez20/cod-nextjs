@@ -8,6 +8,8 @@ import { SectionSplitProps } from "../../utils/SectionProps";
 import ButtonGroup from "../../components/elements/ButtonGroup";
 import Button from "../../components/elements/Button";
 import Modal from "../../components/elements/Modal";
+import CheckCroos from "../../components/elements/icons/checkCross"
+import CheckOk from "../../components/elements/icons/checkOk"
 
 import Image from "../../components/elements/Image";
 
@@ -51,6 +53,7 @@ export default function Tournaments({
   const [user, logOut, updateUser] = useUser();
   const [inscripcionModalActive, setInscripcionModalActive] = useState(false);
   const [inscripcionDone, setInscripcionDone] = useState(false);
+  const [userPay, setUserPay] = useState(false);
   const globalState = useContext(store);
   const router = useRouter();
   const { state, dispatch } = globalState;
@@ -62,18 +65,23 @@ export default function Tournaments({
 
   const { tournament } = state;
 
+  const checkUserPay = () => {
+    const userTournament = user.tournaments.find((e) => e.tid === tournament.id)
+    if (userTournament && userTournament.payed) setUserPay(true)
+  };
+
   useEffect(() => {
     if (
       user &&
       user.tournaments.filter((e) => e.tid === tournament.id).length > 0
     )
       setInscripcionDone(true);
+    checkUserPay();
   }, []);
 
-  // useEffect(() => {
-  //   if (user && user.tournaments.filter((e) => e.tid === id).length > 0) setInscribedUser(true)
-  //   else setInscribedUser(false)
-  // }, [inscripcionDone]);
+  useEffect(() => {
+    checkUserPay();
+  }, [tournament]);
 
   const handleInscripcion = (e) => {
     e.preventDefault();
@@ -89,7 +97,7 @@ export default function Tournaments({
     e.preventDefault();
     inscribeUserToTournament(user.id, tournament).then(() => {
       setInscripcionDone(true);
-    });
+    }).catch(e => console.log("error", e));
   };
 
   const handleCancel = (e) => {
@@ -169,6 +177,7 @@ export default function Tournaments({
                         className=""
                         size="xxs"
                         color="error"
+                        disabled={userPay}
                         onClick={handleDelete}
                       >
                         Borrarme
@@ -176,11 +185,7 @@ export default function Tournaments({
                     </div>
                     <h4 className="mt-8">
                       Pago confirmado:
-                      {user.tournaments.includes(tournament.id) &&
-                      user.tournaments.find((e) => e.tid === tournament.id)
-                        .payed
-                        ? " SI"
-                        : " NO"}
+                      {userPay ? <CheckOk color="#24E5AF"/> : <CheckCroos color="#ff3146"/>}
                     </h4>
                   </>
                 ) : (
@@ -265,8 +270,11 @@ export default function Tournaments({
                   </div>
                   {tournament && (
                     <h3 className="mt-0 mb-12">
-                      {tournament.mapa} | {tournament.modo} | k/d max:{" "}
-                      {tournament.kdmax}{" "}
+                      {tournament.mapa}
+                      <span className="text-color-low"> | </span>
+                      {tournament.modo}
+                      <span className="text-color-low"> | </span> k/d max:
+                      {" "}{tournament.kdmax}
                     </h3>
                   )}
                   <p className="m-0">

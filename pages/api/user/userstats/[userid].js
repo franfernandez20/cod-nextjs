@@ -2,8 +2,11 @@ import { XSRF_TOKEN } from "../../../../lib/api";
 
 export default function handler(req, res) {
   const {
-    query: { userid },
+    query: { userid, platform },
   } = req;
+
+  if (!platform) return res.end("Error - platform es necesario");
+
   var myHeaders = new Headers();
   myHeaders.append(
     "Cookie",
@@ -33,27 +36,33 @@ export default function handler(req, res) {
   //     .then((result) => res.end(`Post: ${result}`))
   //     .catch((error) => console.log("error", error));
 
-  const encodeduser = encodeURIComponent(userid)
-  console.log('userid', userid)
+  const encodeduser = encodeURIComponent(userid);
+  console.log("userid", userid);
   fetch(
     // `https://my.callofduty.com/api/papi-client/stats/cod/v1/title/mw/platform/psn/gamer/${userid}/profile/type/wz`,
-    `https://my.callofduty.com/api/papi-client/stats/cod/v1/title/mw/platform/uno/gamer/${encodeduser}/profile/type/wz`,
+    `https://my.callofduty.com/api/papi-client/stats/cod/v1/title/mw/platform/${platform}/gamer/${encodeduser}/profile/type/wz`,
     requestOptions
   )
     .then((response) => response.json())
-    .then(({ status, data }) => {
-      console.log({status})
-      if (status === 'success') {
-        const { username, lifetime: { mode }, weekly } = data;
-        const { br_all, br, br_dmz  } = mode
-        const result = {
+    .then((result) => {
+      console.log("--->", result);
+      const { status, data } = result;
+      if (status === "success") {
+        const {
           username,
-          wz: { br_all, br, br_dmz, weekly }
+          lifetime: { mode },
+          weekly,
+        } = data;
+        const { br_all, br, br_dmz } = mode;
+        const parsedResult = {
+          status,
+          username,
+          wz: { br_all, br, br_dmz, weekly },
         };
         res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify(result))
-      } else res.end('error - mejorar esto')
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify(parsedResult));
+      } else res.end(JSON.stringify({ status, message: data.message }));
     })
-    .catch((error) => res.end('error'));
+    .catch((error) => res.end(JSON.stringify(error)));
 }

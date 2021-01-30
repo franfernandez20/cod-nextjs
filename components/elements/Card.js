@@ -1,21 +1,46 @@
-import { useContext } from "react";
-import { useRouter } from 'next/router'
+import { useContext, useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import { store } from "../../hooks/store";
 
+import CheckOk from "./icons/checkOk";
+import CheckCroos from "./icons/checkCross";
+
 export default function Card({ tournament }) {
-  const router = useRouter()
+  const router = useRouter();
+  const [inscribedPayed, setInscribedPayed] = useState([false, false]);
   const globalState = useContext(store);
   const { state, dispatch } = globalState;
 
-  const { modo, kdmax, prize, fecha, mapa, payed, topay, visible } = tournament;
+  const {
+    id,
+    modo,
+    kdmax,
+    prize,
+    fecha,
+    mapa,
+    payed,
+    topay,
+    visible,
+  } = tournament;
   const total = payed.length + topay.length;
+  const { user } = state;
+
+  useEffect(() => {
+    console.log('user- card USEefffect', user)
+    if (user) {
+      const userTournament = user.tournaments.find((e) => e.tid === id);
+      if (userTournament) {
+        setInscribedPayed([true, userTournament.payed]);
+      } else setInscribedPayed([false, false])
+    }
+  }, [user]);
 
   const handleTournamentSelect = () => {
     dispatch({ type: "setTournament", value: tournament });
     router.push({
-      pathname: '/tournaments/[id]',
+      pathname: "/tournaments/[id]",
       query: { id: tournament.id },
-    })    
+    });
   };
 
   return (
@@ -45,6 +70,11 @@ export default function Card({ tournament }) {
                       {new Date(fecha).toLocaleDateString()} |{" "}
                       {new Date(fecha).toLocaleTimeString()}
                     </div>
+                    {inscribedPayed[0] && (
+                      <div className="match-details-listing__timestamp ">
+                        <p className="text-xxs text-color-success"> Apuntado</p>
+                      </div>
+                    )}
                     <div className="match-details-listing__placement warzone loss">
                       <span className="text-color-success">
                         {total > 48 ? total : 48}
@@ -62,8 +92,20 @@ export default function Card({ tournament }) {
                   <div className="match-stats-listing__stat">{kdmax}</div>
                 </li>
                 <li className="match-stats-listing__item warzone card_basic">
-                  {/* <div className="match-stats-listing__title"></div> */}
-                  <div className="match-stats-listing__stat"></div>
+                  {inscribedPayed[0] && (
+                    <>
+                      <div className="match-stats-listing__title font-size-small-mobile">
+                        Pago confirmado
+                      </div>
+                      <div className="match-stats-listing__stat">
+                        {inscribedPayed[1] ? (
+                          <CheckOk color="#24E5AF" />
+                        ) : (
+                          <CheckCroos color="#ff3146" />
+                        )}
+                      </div>
+                    </>
+                  )}
                 </li>
                 <li className="match-stats-listing__item warzone card_basic">
                   <div className="match-stats-listing__title">Inscripción</div>

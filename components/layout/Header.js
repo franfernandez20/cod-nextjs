@@ -1,13 +1,21 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
+import Link from "next/link";
 import PropTypes from "prop-types";
 import classNames from "classnames";
-import Link from "next/link";
-import Logo from "./partials/Logo";
-import Avatar from "../elements/Avatar";
-import { loginWithGoogle, logOutFromGoogle, createTournament } from "../../firebase/client";
+import { useRouter } from "next/router";
 import useUser from "../../hooks/useUser";
-import { useRouter } from 'next/router'
+import Logo from "./partials/Logo";
+
+import Avatar from "../elements/Avatar";
 import Button from "../elements/Button";
+import PsnIcon from "../elements/icons/psnIcon";
+import ActivisionIcon from "../elements/icons/activisionIcon";
+
+import {
+  loginWithGoogle,
+  logOutFromGoogle,
+  createTournament,
+} from "../../firebase/client";
 import { getUserDetails } from "../../services/codtrackerService";
 
 import { store } from "../../hooks/store";
@@ -134,13 +142,12 @@ const Header = ({
   };
 
   const handleLogoClick = () => {
-    console.log("Click");
-    getUserDetailsCT("destrozapanchos2").then(console.log);
+    router.push("/");
   };
 
   const handleOnUserClick = () => {
-    console.log("Click")
-    router.push("/settings")
+    console.log("Click");
+    router.push("/settings");
   };
 
   return (
@@ -158,12 +165,26 @@ const Header = ({
               <>
                 {user && user.username && (
                   <div className="header-nav-bar" onClick={handleOnUserClick}>
-                    <Avatar alt={user.username} src={user.avatar} />
+                    <Avatar
+                      alt={user.username}
+                      src={
+                        user.cod && user.cod.gameAvatar
+                          ? user.cod.gameAvatar
+                          : user.avatar
+                      }
+                    />
                     <div className="header-nav-user">
                       <p className="text-color-primary has-bottom-divider">
                         {user.username}
                       </p>
-                      <p className="text-color-secondary">{user.gameid}</p>
+                      <div className="header-nav-user-game">
+                        {user.cod && user.cod.platform === "psn" ? (
+                          <PsnIcon className="psn-icon" />
+                        ) : (
+                          <ActivisionIcon className="psn-icon" />
+                        )}
+                        <p className="text-color-secondary">{user.gameid}</p>
+                      </div>
                     </div>
                     {user.cod && (
                       <div className="header-nav-kd">

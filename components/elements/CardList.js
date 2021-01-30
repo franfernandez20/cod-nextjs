@@ -1,30 +1,5 @@
-import React from "react";
-import Card from "./Card";
 import classNames from "classnames";
-
-const torneos = [
-  {
-    type: "Tríos",
-    kd: "2.0",
-    inscripcion: "5",
-    fecha: "Domingo 28 Febrero",
-    mapa: "Verdansk",
-  },
-  {
-    type: "Tríos",
-    kd: "1.5",
-    inscripcion: "1",
-    fecha: "Domingo 28 Febrero",
-    mapa: "Verdansk",
-  },
-  {
-    type: "Dúos",
-    kd: "2.0",
-    inscripcion: "1",
-    fecha: "Domingo 28 Febrero",
-    mapa: "Verdansk",
-  },
-];
+import Card from "./Card";
 
 export default function CardList({ alt, src, text, list }) {
   return (
@@ -46,7 +21,10 @@ export default function CardList({ alt, src, text, list }) {
             <div className="page-wrapper recentmatches-last-matches">
               <div className="page-wrapper recentmatches-last-matches">
                 <ul className="recentmatches-listing card_basic">
-                  {list && list.map((tournament) => <Card tournament={tournament} />)}
+                  {list &&
+                    list.map((tournament) => (
+                      <Card tournament={tournament} />
+                    ))}
                 </ul>
               </div>
             </div>

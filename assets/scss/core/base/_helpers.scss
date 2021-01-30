@@ -588,6 +588,10 @@ img.has-shadow {
 	.magin-top-16-mobile {
 		margin-top: 16px;
 	}
+
+	.font-size-small-mobile {
+		font: -webkit-small-control;
+	}
 }
 
 @include media( '>medium' ) {

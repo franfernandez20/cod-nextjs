@@ -8,15 +8,15 @@ import Button from "../elements/Button";
 import Image from "../elements/Image";
 import Modal from "../elements/Modal";
 import Input from "../elements/Input";
-import Select from "../elements/Select";
 
 import {
   loginWithGoogle,
   logOutFromGoogle,
-  createDBUser,
+  updateDBUser,
 } from "../../firebase/client";
 import * as codtrackerService from "../../services/codtrackerService";
 import * as codTournamentService from "../../services/codtournamentService";
+import Checkbox from "../elements/Checkbox";
 
 const propTypes = {
   ...SectionProps.types,
@@ -43,9 +43,10 @@ const Hero = ({
   const [registroModalActive, setRegistroModalActive] = useState(false);
   const [registroValue, setRegistroValue] = useState("");
   const [resgistroResults, setResgistroResults] = useState([]);
-  const [registroError, setRegistroError] = useState(false);
+  const [registroError, setRegistroError] = useState("");
   const [logged, setLogged] = useState(undefined);
   const [loading, setLoading] = useState(false);
+  const [platform, setPlatform] = useState("uno");
 
   const openModal = (e) => {
     e.preventDefault();
@@ -61,6 +62,7 @@ const Hero = ({
     e && e.preventDefault();
     setRegistroModalActive(false);
     setRegistroValue("");
+    setRegistroError("");
     setResgistroResults([]);
     setLoading(false);
   };
@@ -80,18 +82,38 @@ const Hero = ({
     console.log("clicket");
   };
 
-  const checkUser = (user) => {
-    setLoading(true);
-    const { username } = user;
-    return codTournamentService.getUserStats(username).then((stats) => {
-      console.log("stats", stats);
-      const { kdRatio, deaths, kills, wins } = stats.wz.br_all.properties;
-      const newlogged = { ...user, kdRatio, deaths, kills, wins };
-      setLogged(newlogged);
-      setResgistroResults([]);
-      setLoading(false);
-      console.log("newlogged", newlogged);
-    });
+  const checkUser = (codUser) => {
+    const { username, platform, avatar } = codUser;
+    return codTournamentService
+      .getUserStats(username, platform)
+      .then((stats) => {
+        console.log("stats", stats);
+        if (stats.status === "success") {
+          const { kdRatio, deaths, kills, wins } = stats.wz.br_all.properties;
+
+          const mapAvatar =
+            avatar && avatar.avatarUrlLargeSsl
+              ? avatar.avatarUrlLargeSsl
+              : avatar;
+          const newlogged = {
+            ...codUser,
+            kdRatio,
+            deaths,
+            kills,
+            wins,
+            avatar: mapAvatar,
+          };
+          setLogged(newlogged);
+          setResgistroResults([]);
+          console.log("newlogged", newlogged);
+        } else {
+          if (stats.message === "Not permitted: not allowed")
+            setRegistroError("Este usuario es privado");
+          else setRegistroError("No se encontró el usuario");
+        }
+        setLoading(false);
+      })
+      .catch((e) => console.log(e));
   };
 
   const handleRegistroSubmit = (e) => {
@@ -99,22 +121,23 @@ const Hero = ({
     console.log("ddd", registroValue);
     setLoading(true);
     codTournamentService
-      .getUserDetails(registroValue)
+      .getUserDetails(registroValue, platform)
       .then((result) => {
+        console.log("result", result);
         if (result.length === 0) {
-          setRegistroError(true)
+          setRegistroError("No se encontró el usuario");
+          setLoading(false);
         } else if (result.length > 1) {
           setResgistroResults(result);
-          console.log("result", result);
-          console.log("resgistroResults", resgistroResults);
+          setLoading(false);
         } else if (result.length === 1) {
-          const user = result[0];
-          checkUser(user).then(() => {});
-        }
-        setLoading(false);
+          const codUser = result[0];
+          console.log("codUser", codUser);
+          checkUser(codUser);
+        }        
       })
       .catch((e) => {
-        console.log("error");
+        console.log("error", e);
       });
     setRegistroValue("");
   };
@@ -122,6 +145,7 @@ const Hero = ({
   const handleSelectedUser = (user, e) => (e) => {
     console.log("yessss", e);
     console.log("yessss", user);
+    setLoading(true);
     checkUser(user);
   };
 
@@ -136,25 +160,35 @@ const Hero = ({
     const {
       platform,
       username,
-      accountId,
-      gameAvatar = "",
+      accountId = "",
+      avatar = "",
       kdRatio,
       deaths,
       kills,
       wins,
     } = logged;
+    const cod = {
+      platform,
+      accountId,
+      gameAvatar: avatar,
+      kdRatio,
+      deaths,
+      kills,
+      wins,
+    };
     const newuser = {
       ...user,
       gameid: username,
-      cod: { platform, accountId, gameAvatar, kdRatio, deaths, kills, wins },
+      cod,
     };
-    createDBUser(newuser);
+    updateDBUser(user.id, username, cod);
     updateUser(newuser);
     closeRegistroModal();
   };
 
   const handleCancel = (e) => {
     setLogged(undefined);
+    setRegistroError("");
   };
 
   const outerClasses = classNames(
@@ -170,6 +204,15 @@ const Hero = ({
     "hero-inner section-inner",
     topDivider && "has-top-divider",
     bottomDivider && "has-bottom-divider"
+  );
+
+  const selectPSNClasses = classNames(
+    "select",
+    platform === "psn" && "select-press"
+  );
+  const selectUnoClasses = classNames(
+    "select",
+    platform === "uno" && "select-press"
   );
 
   return (
@@ -216,7 +259,7 @@ const Hero = ({
           </div>
           <Modal show={registroModalActive} handleClose={closeRegistroModal}>
             {loading ? (
-              <img src="/spinner.gif" />
+              <img src="/spinner2.gif" />
             ) : (
               <>
                 {!logged ? (
@@ -227,11 +270,23 @@ const Hero = ({
                         Vamos a buscar tu usuario en{" "}
                         <strong>https://my.callofduty.com/</strong>
                       </p>
-                      {
-                        registroError && (
-                          <p className="text-color-error"> No se encontró el usuario</p>
-                        )
-                      }
+                      <div className="mb-16">
+                        <span
+                          className={selectPSNClasses}
+                          onClick={() => setPlatform("psn")}
+                        >
+                          PSN
+                        </span>
+                        <span
+                          className={selectUnoClasses}
+                          onClick={() => setPlatform("uno")}
+                        >
+                          Activision
+                        </span>
+                      </div>
+                      {registroError && (
+                        <p className="text-color-error"> {registroError}</p>
+                      )}
                     </div>
                     <form onSubmit={handleRegistroSubmit}>
                       {resgistroResults.length === 0 && (

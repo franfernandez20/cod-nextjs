@@ -508,6 +508,18 @@ ol, ul {
 @include media( '<=medium' ) {
     .match-details-listing .match-details-listing__content, .match-details-listing .match-details-listing__content {
         font-size: 13px;
+        // margin-top: -12px;
+    }
+}
+
+@include media( '<=medium' ) {
+    .match-details-listing__content .match-details-listing__mode {
+        // font-size: 13px;
+        margin-top: -12px;
+    }
+
+    .match-details-listing__content .match-details-listing__timestamp {
+        margin-top: -8px;
     }
 }
 

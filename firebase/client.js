@@ -75,6 +75,7 @@ export const createDBUser = ({
       gameid,
       createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
       cod,
+      tournaments: [],
       content: {
         wallet: 0, //saldo
         wasted: 0, //dinero gastado
@@ -98,6 +99,18 @@ export const unregisterUser = (uid, gameid) => {
       cod: null,
       gameid: null,
       previousGameid: gameid,
+    },
+    { merge: true }
+  );
+};
+
+export const updateDBUser = (uid, gameid, cod) => {
+  var userRef = dbService.collection("users").doc(uid);
+
+  return userRef.set(
+    {
+      cod: cod,
+      gameid: gameid
     },
     { merge: true }
   );
@@ -220,7 +233,7 @@ export const fetchAllTournaments = () => {
 
 export const inscribeUserToTournament = (uid, tournament) => {
   const { id: tid, topay } = tournament;
-  if (topay.includes(uid)) return
+  if (topay.includes(uid)) return (new Promise(() => undefined))
   var tournamentRef = dbService.collection("tournament").doc(tid);
 
   return tournamentRef
