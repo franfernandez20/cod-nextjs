@@ -31,13 +31,15 @@ export default function Settings() {
                 <Button
                   className="magin-bottom-8-mobile"
                   color="primary"
+                  title={user.tournaments.length > 0 ? "Debes borrarte de tus torneos" : "Borrar usuario"}
                   size="sm"
                   onClick={handleLogOut}
+                  disabled={user.tournaments.length > 0}
                   wideMobile
                 >
                   Borrar cuenta asociada
                 </Button>
-                <span className="text-color-secondary  margin-left-64-desktop">
+                <span className="text-color-secondary font-elect margin-left-64-desktop">
                   {user.gameid}
                 </span>
               </div>

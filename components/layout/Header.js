@@ -10,6 +10,8 @@ import Avatar from "../elements/Avatar";
 import Button from "../elements/Button";
 import PsnIcon from "../elements/icons/psnIcon";
 import ActivisionIcon from "../elements/icons/activisionIcon";
+import Cod_JF from "../elements/icons/cod_JF";
+import CodKD from "../elements/codKD";
 
 import {
   loginWithGoogle,
@@ -53,7 +55,7 @@ const Header = ({
   const [user, logOut, updateUser] = useUser();
 
   const globalState = useContext(store);
-  const router = useRouter()
+  const router = useRouter();
 
   const { dispatch } = globalState; // nota para modificar el stado en el contexto store
 
@@ -159,7 +161,8 @@ const Header = ({
             bottomDivider && "has-bottom-divider"
           )}
         >
-          <Logo onClick={handleLogoClick} />
+          {/* <Cod_JF onClick={handleLogoClick} /> */}
+          <img className="logo-header" src="/svg-fondo-trans.png" />
           {!hideNav && (
             <>
               <>
@@ -183,17 +186,12 @@ const Header = ({
                         ) : (
                           <ActivisionIcon className="psn-icon" />
                         )}
-                        <p className="text-color-secondary">{user.gameid}</p>
+                        <p className="text-color-secondary font-elect">{user.gameid}</p>
                       </div>
                     </div>
                     {user.cod && (
                       <div className="header-nav-kd">
-                        <p className="ml-8 mt-0 mr-16 mb-0 ta-l text-xxs">
-                          K/D
-                          <span className="text-color-high fw-700 ml-8 mt-0 mr-16 mb-0 ta-l has-shadow text-sm">
-                            {Math.floor(user.cod.kdRatio * 100) / 100}
-                          </span>
-                        </p>
+                        <CodKD kdRatio={user.cod.kdRatio} />
                       </div>
                     )}
                   </div>
@@ -249,12 +247,7 @@ const Header = ({
                           <li>
                             <div className="header-nav-right-kd">
                               <Link href="#0" onClick={closeMenu}>
-                                <p className="ml-8 mt-0 mr-16 mb-0 ta-l text-xxs">
-                                  K/D
-                                  <span className="text-color-high fw-700 ml-8 mt-0 mr-16 mb-0 ta-l has-shadow text-sm">
-                                    {Math.floor(user.cod.kdRatio * 100) / 100}
-                                  </span>
-                                </p>
+                                <CodKD kdRatio={user.cod.kdRatio} />
                               </Link>
                             </div>
                           </li>

@@ -126,6 +126,13 @@
 		}
 	}
 
+	.logo-header {
+		width: 60px;
+		height: auto;
+		margin-top: 8px;
+		margin-right: 0px;
+	}
+
 	.header-nav-kd {
 		display: none;
 	}
@@ -196,6 +203,13 @@
 
 	.site-header-inner {
 		height: $header-height__desktop;
+	
+		.logo-header {
+			width: 80px;
+			height: auto;
+			margin-top: 8px;
+			margin-right: 50px;
+		}
 	}
 
 	.header-nav-user {
@@ -212,4 +226,171 @@
 .back-foto {
 	// background-image: url(../../../images/cod/friends-feed-bg-texture-2x2.png);
 	background-image: url(../../../../public/images/s1-wz-rebirth.jpg);
+}
+
+
+/// codKD
+
+@include media( '<=medium' ) {
+
+	.initial {
+		.kd-ratio {
+			margin-left: -30px;
+		}
+
+		.prop-bm {
+			margin-left: -30px;
+		}
+	}
+
+}
+
+.initial {
+
+
+	display: grid;
+	margin-left: 10px;
+	font-family: 'Electrolize', sans-serif;
+	
+	.kd-ratio {
+		font-size: 28px;
+		font-weight: 600;
+		position: absolute;
+		bottom: 60%;
+		width: 100%;
+		text-align: center;
+		color: #24E5AF;
+		
+	}
+	
+	.prop-bm {
+		font-size: 8px;
+		font-weight: 600;
+		color: #24E5AF;
+		position: absolute;
+		bottom: 25%;
+		width: 100%;
+		text-align: center;
+
+	}
+
+	.kd-circle {
+		background: rgb(29, 28, 28);
+		width: 60px;
+		top: 8%;
+    	margin-left: 5px;
+  		border-radius: 50%;
+		line-height: 0;
+  		position: relative;
+	}
+	.kd-circle-outer {
+		background: #24E5AF;
+		width: 70px;
+		height: 70px;
+  		border-radius: 50%;
+		line-height: 0;
+  		position: relative;
+	}
+
+	.kd-circle::after {
+		content: "";
+		display: block;
+		padding-bottom: 100%;
+	  }
+
+	 
+
+	* {
+		-webkit-box-sizing: border-box;
+		-moz-box-sizing: border-box;
+		box-sizing: border-box;  
+	  }
+	  
+	  .donut-chart {
+		position: relative;
+		  width: 200px;
+		  height: 200px;
+		  margin: 0 auto 2rem;
+		  border-radius: 100%
+	   }
+	  p.center {
+		background: #394264;
+		position: absolute;
+		text-align: center;
+	  font-size: 28px;
+		top:0;left:0;bottom:0;right:0;
+		width: 130px;
+		height: 130px;
+		margin: auto;
+		border-radius: 50%;
+		line-height: 35px;
+		padding: 15% 0 0;
+		display: grid;
+	  }
+	  
+	  /* .aa {
+		display: flex;
+	  } */
+		  
+		  
+	  .portion-block {
+		  border-radius: 50%;
+		  clip: rect(0px, 200px, 200px, 100px);
+		  height: 100%;
+		  position: absolute;
+		  width: 100%;
+		}
+	  .circle {
+		  border-radius: 50%;
+		  clip: rect(0px, 100px, 200px, 0px);
+		  height: 100%;
+		  position: absolute;
+		  width: 100%;
+		  font-family: monospace;
+		  font-size: 1.5rem;
+		}
+		  
+		  
+	  #part1 {
+		  transform: rotate(0deg);
+		}
+	  
+		  #part1 .circle {
+			  background-color: #E64C65;
+			  /*transform: rotate(76deg);*/
+			  animation: first 1s 1 forwards;
+			}
+		  
+		  
+	  #part2 {
+		  transform: rotate(100deg);
+		}
+	  #part2 .circle {
+		  background-color: #11A8AB;
+		  animation: second 1s 1 forwards 1s;
+		}
+	  #part3 {
+		  transform: rotate(250deg);
+	  }
+		  #part3 .circle {
+			  background-color: #4FC4F6;
+			  animation: third 0.5s 1 forwards 2s;
+		  }
+		  
+		  
+	  /* Animation */
+	  @keyframes first {
+		  from {transform: rotate(0deg);}
+		  to {transform: rotate(100deg);}
+	  }
+		  
+	  @keyframes second {
+		  from {transform: rotate(0deg);}
+		  to {transform: rotate(150deg);}
+	  }
+		  
+	  @keyframes third {
+		  from {transform: rotate(0deg);}
+		  to {transform: rotate(111deg);}
+	  }
 }

@@ -134,7 +134,7 @@ const Hero = ({
           const codUser = result[0];
           console.log("codUser", codUser);
           checkUser(codUser);
-        }        
+        }
       })
       .catch((e) => {
         console.log("error", e);
@@ -220,6 +220,7 @@ const Hero = ({
       <div className="container-sm">
         <div className={innerClasses}>
           <div className="hero-content">
+            <img className="logo" src="/svg-fondo-trans.png" />
             <h1
               className="mt-0 mb-16 reveal-from-bottom"
               data-reveal-delay="200"

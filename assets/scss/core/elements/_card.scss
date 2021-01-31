@@ -22,7 +22,7 @@
 }
 
 .doughnut-component .doughnut__details {
-    font-family: "Montserrat", Verdana, Arial, Helvetica, sans-serif;
+    // font-family: "Montserrat", Verdana, Arial, Helvetica, sans-serif;
     font-weight: 500;
     font-style: normal;
     font-size: 13px;
@@ -65,8 +65,9 @@
     box-sizing: border-box;
 }
 
-.dale_padding {
+.cards_container {
     padding: 0;
+    font-family: 'Electrolize', sans-serif;
 }
 
 //////@at-root
@@ -132,7 +133,7 @@ ol, ul {
 .recentmatches-listing__item {
     position: relative;
     display: none;
-    font-family: "Montserrat", Verdana, Arial, Helvetica, sans-serif;
+    // font-family: "Montserrat", Verdana, Arial, Helvetica, sans-serif;
     font-style: normal;
     font-weight: 500;
     width: 100%;
@@ -177,7 +178,7 @@ ol, ul {
     .recentmatches-listing__item {
         position: relative;
         display: none;
-        font-family: "Montserrat", Verdana, Arial, Helvetica, sans-serif;
+        // font-family: "Montserrat", Verdana, Arial, Helvetica, sans-serif;
         font-style: normal;
         font-weight: 500;
         width: 100%;
@@ -245,7 +246,7 @@ ol, ul {
     -ms-flex-align: end;
     display: flex;
     align-items: flex-start;
-    font-family: "Montserrat", Verdana, Arial, Helvetica, sans-serif;
+    // font-family: "Montserrat", Verdana, Arial, Helvetica, sans-serif;
     font-weight: 500;
     font-style: normal;
     color: #777777;
@@ -256,7 +257,7 @@ ol, ul {
 }
 
 .match-details-listing, .match-details-listing {
-    font-family: "Montserrat", Verdana, Arial, Helvetica, sans-serif;
+    // font-family: "Montserrat", Verdana, Arial, Helvetica, sans-serif;
     font-style: normal;
     font-weight: 500;
     color: #fff;
@@ -272,7 +273,7 @@ ol, ul {
 }
 
 .match-details-listing__map {
-    font-family: "Montserrat", Verdana, Arial, Helvetica, sans-serif;
+    // font-family: "Montserrat", Verdana, Arial, Helvetica, sans-serif;
     font-weight: 500;
     font-style: normal;
     text-transform: capitalize;
