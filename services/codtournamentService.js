@@ -26,3 +26,17 @@ export const getUserStats = (gamerId, platform='psn') => {
       console.log(error);
     });
 };
+
+export const getTourStats = (hostid, platform='psn') => {
+  const gameIdEncode = encodeURIComponent(gamerId)
+  const url = `${api_url}user/userstats/${gameIdEncode}?platform=${platform}`;
+
+  return fetch(url)
+    .then((response) => response.json())
+    .then(( data ) => {
+      return data
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};

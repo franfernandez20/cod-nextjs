@@ -8,8 +8,9 @@ import { SectionSplitProps } from "../../utils/SectionProps";
 import ButtonGroup from "../../components/elements/ButtonGroup";
 import Button from "../../components/elements/Button";
 import Modal from "../../components/elements/Modal";
-import CheckCroos from "../../components/elements/icons/checkCross"
-import CheckOk from "../../components/elements/icons/checkOk"
+import TourStats from "../../components/elements/tourStats";
+import CheckCroos from "../../components/elements/icons/checkCross";
+import CheckOk from "../../components/elements/icons/checkOk";
 
 import Image from "../../components/elements/Image";
 
@@ -17,7 +18,16 @@ import { store } from "../../hooks/store";
 import {
   inscribeUserToTournament,
   deleteUserToTournament,
+  getTournamentWithStats,
 } from "../../firebase/client";
+
+// import {} from "../../services/codtournamentService"
+
+const tourStates = {
+  PROX: 0,
+  JUST_FINISH: 1,
+  FINISHED: 2,
+};
 
 const diaSemana = [
   "Domingo",
@@ -54,6 +64,8 @@ export default function Tournaments({
   const [inscripcionModalActive, setInscripcionModalActive] = useState(false);
   const [inscripcionDone, setInscripcionDone] = useState(false);
   const [userPay, setUserPay] = useState(false);
+  const [tourState, setTourState] = useState(tourStates.PROX);
+  const [stats, setStats] = useState([]);
   const globalState = useContext(store);
   const router = useRouter();
   const { state, dispatch } = globalState;
@@ -66,17 +78,38 @@ export default function Tournaments({
   const { tournament } = state;
 
   const checkUserPay = () => {
-    const userTournament = user.tournaments.find((e) => e.tid === tournament.id)
-    if (userTournament && userTournament.payed) setUserPay(true)
+    const userTournament =
+      user && user.tournaments.find((e) => e.tid === tournament.id);
+    if (userTournament && userTournament.payed) setUserPay(true);
+  };
+
+  const loadTourStats = () => {
+    getTournamentWithStats(tournament.id).then((tour) => {
+      setTourState(tourStates.FINISHED);
+      console.log("tour", tour);
+      setStats(tour.stats);
+    });
+  };
+
+  const checkTourFinish = () => {
+    const now = new Date().getTime();
+    const halfhour = 30 * 60 * 1000;
+    if (tournament && now > tournament.fecha) {
+      now - halfhour > tournament.fecha
+        ? loadTourStats()
+        : setTourState(tourStates.JUST_FINISH);
+    }
   };
 
   useEffect(() => {
     if (
       user &&
+      user.tournaments &&
       user.tournaments.filter((e) => e.tid === tournament.id).length > 0
     )
       setInscripcionDone(true);
     checkUserPay();
+    checkTourFinish();
   }, []);
 
   useEffect(() => {
@@ -95,9 +128,11 @@ export default function Tournaments({
 
   const handleConfirm = (e) => {
     e.preventDefault();
-    inscribeUserToTournament(user.id, tournament).then(() => {
-      setInscripcionDone(true);
-    }).catch(e => console.log("error", e));
+    inscribeUserToTournament(user.id, tournament)
+      .then(() => {
+        setInscripcionDone(true);
+      })
+      .catch((e) => console.log("error", e));
   };
 
   const handleCancel = (e) => {
@@ -145,119 +180,145 @@ export default function Tournaments({
       {tournament && (
         <div className="container">
           <div className={innerClasses}>
-            <div className="center-content heading">
-              <h2
-                className="mt-0 mb-16 reveal-from-bottom"
-                data-reveal-delay="200"
-              >
-                <span className="text-color-primary">
-                  {diaSemana[new Date(tournament.fecha).getDay()]}
-                </span>
-              </h2>
-              <h3
-                className="mt-0 mb-16 reveal-from-bottom"
-                data-reveal-delay="200"
-              >
-                <span className="text-color-low">
-                  {new Date(tournament.fecha).toLocaleDateString()}
-                </span>
-                <span className="text-color-primary"> | </span>
-                <span className="text-color-high">
-                  {new Date(tournament.fecha).toLocaleTimeString()}
-                </span>
-              </h3>
-              <div className="container-xs">
-                {inscripcionDone ? (
-                  <>
-                    <div className="borrarme-section">
-                      <p className="text-xs mr-16">
-                        Ya estas apuntado a este torneo
-                      </p>
-                      <Button
-                        className=""
-                        size="xxs"
-                        color="error"
-                        disabled={userPay}
-                        onClick={handleDelete}
-                      >
-                        Borrarme
-                      </Button>
+            {tourState === tourStates.PROX && (
+              <div className="center-content heading">
+                <h2
+                  className="mt-0 mb-16 reveal-from-bottom"
+                  data-reveal-delay="200"
+                >
+                  <span className="text-color-primary">
+                    {diaSemana[new Date(tournament.fecha).getDay()]}
+                  </span>
+                </h2>
+                <h3
+                  className="mt-0 mb-16 reveal-from-bottom"
+                  data-reveal-delay="200"
+                >
+                  <span className="text-color-low">
+                    {new Date(tournament.fecha).toLocaleDateString()}
+                  </span>
+                  <span className="text-color-primary"> | </span>
+                  <span className="text-color-high">
+                    {new Date(tournament.fecha).toLocaleTimeString()}
+                  </span>
+                </h3>
+                <div className="container-xs">
+                  {inscripcionDone ? (
+                    <>
+                      <div className="borrarme-section">
+                        <p className="text-xs mr-16">
+                          Ya estas apuntado a este torneo
+                        </p>
+                        <Button
+                          className=""
+                          size="xxs"
+                          color="error"
+                          disabled={userPay}
+                          onClick={handleDelete}
+                        >
+                          Borrarme
+                        </Button>
+                      </div>
+                      <h4 className="mt-8">
+                        Pago confirmado:
+                        {userPay ? (
+                          <CheckOk color="#24E5AF" />
+                        ) : (
+                          <CheckCroos color="#ff3146" />
+                        )}
+                      </h4>
+                    </>
+                  ) : (
+                    <div className="reveal-from-bottom" data-reveal-delay="600">
+                      <ButtonGroup>
+                        <Button
+                          color="primary"
+                          onClick={handleInscripcion}
+                          disabled={!validUser}
+                          wideMobile
+                        >
+                          Inscribirse
+                        </Button>
+                      </ButtonGroup>
                     </div>
-                    <h4 className="mt-8">
-                      Pago confirmado:
-                      {userPay ? <CheckOk color="#24E5AF"/> : <CheckCroos color="#ff3146"/>}
-                    </h4>
-                  </>
-                ) : (
-                  <div className="reveal-from-bottom" data-reveal-delay="600">
-                    <ButtonGroup>
-                      <Button
-                        color="primary"
-                        onClick={handleInscripcion}
-                        disabled={!validUser}
-                        wideMobile
+                  )}
+                </div>
+                <Modal
+                  show={inscripcionModalActive}
+                  handleClose={closeInscripcionModal}
+                >
+                  {!inscripcionDone ? (
+                    <div>
+                      <p>
+                        Por el momento los métodos de pago son mediante Bizum al
+                        número de teléfono indicado con tu GameId como asunto.
+                      </p>
+                      <h4 className="mb-8">690 000 000</h4>
+                      <p className="mb-8">
+                        Mediante PayPal en el siguiente enlace
+                      </p>
+                      <a
+                        className="text-color-low tt-underline"
+                        href="https://paypal.me/codJF?locale.x=es_ES"
+                        target="_blank"
+                        rel="noopener noreferrer"
                       >
-                        Inscribirse
-                      </Button>
-                    </ButtonGroup>
-                  </div>
-                )}
+                        PayPal COD_JF
+                      </a>
+                      <p className="mt-16">
+                        Una vez validado el pago apareceras inscrito en el
+                        torneo. Y tendrás acceso con tu GameId
+                      </p>
+                      <p className="text-color-low tt-underline">
+                        <span className="text-color-primary">*</span> Por qué de
+                        estos metodos de pago
+                      </p>
+                      <ButtonGroup className="mt-8">
+                        <Button
+                          tag="a"
+                          color="primary"
+                          size="sm"
+                          onClick={handleConfirm}
+                          wideMobile
+                        >
+                          Confirmar
+                        </Button>
+                        <Button
+                          tag="a"
+                          size="sm"
+                          color="error"
+                          onClick={handleCancel}
+                          wideMobile
+                        >
+                          Cancelar
+                        </Button>
+                      </ButtonGroup>
+                    </div>
+                  ) : (
+                    <div>
+                      <h1 className="text-color-high">
+                        {" "}
+                        ¡ Felicidades estas inscrito !
+                      </h1>
+                      <h3 className="text-color-seconday">
+                        {" "}
+                        Práctica ya queda poco{" "}
+                      </h3>
+                    </div>
+                  )}
+                </Modal>
               </div>
-              <Modal
-                show={inscripcionModalActive}
-                handleClose={closeInscripcionModal}
-              >
-                {!inscripcionDone ? (
-                  <div>
-                    <p>
-                      Por el momento el metodo de pago será a través de Bizum a
-                      fín de evitar comisiones de terceros. Tendréis que
-                      realizar el pago al número de teléfono indicado con tu
-                      GameId como asunto.
-                    </p>
-                    <h4>690 000 000</h4>
-                    <p>
-                      Una vez validado el pago apareceras inscrito en el torneo.
-                      Y tendrás acceso a el con tu GameId
-                    </p>
-                    <p className="text-color-low">
-                      Consulta esta sección para mas información{" "}
-                    </p>
-                    <ButtonGroup className="mt-8">
-                      <Button
-                        tag="a"
-                        color="primary"
-                        size="sm"
-                        onClick={handleConfirm}
-                        wideMobile
-                      >
-                        Confirmar
-                      </Button>
-                      <Button
-                        tag="a"
-                        size="sm"
-                        color="error"
-                        onClick={handleCancel}
-                        wideMobile
-                      >
-                        Cancelar
-                      </Button>
-                    </ButtonGroup>
-                  </div>
-                ) : (
-                  <div>
-                    <h1 className="text-color-high">
-                      {" "}
-                      ¡ Felicidades estas inscrito !
-                    </h1>
-                    <h3 className="text-color-seconday">
-                      {" "}
-                      Práctica ya queda poco{" "}
-                    </h3>
-                  </div>
-                )}
-              </Modal>
-            </div>
+            )}
+            {tourState === tourStates.JUST_FINISH && (
+              <div>
+                <p> Estamos esperando los resultados</p>
+              </div>
+            )}
+            {stats && tourState === tourStates.FINISHED && (
+              <div>
+                <TourStats stats={stats} />
+              </div>
+            )}
             {/* <SectionHeader data={sectionHeader} className="center-content back-foto" /> */}
             <div className={splitClasses}>
               <div className="split-item">
@@ -273,8 +334,8 @@ export default function Tournaments({
                       {tournament.mapa}
                       <span className="text-color-low"> | </span>
                       {tournament.modo}
-                      <span className="text-color-low"> | </span> k/d max:
-                      {" "}{tournament.kdmax}
+                      <span className="text-color-low"> | </span> k/d max:{" "}
+                      {tournament.kdmax}
                     </h3>
                   )}
                   <p className="m-0">

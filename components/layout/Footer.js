@@ -40,12 +40,13 @@ const Footer = ({
             topDivider && 'has-top-divider'
           )}>
           <div className="footer-top space-between text-xxs">
-            <Logo />
+            {/* <Logo /> */}
+            <img className="logo-footer" src="/svg-fondo-trans.png" />
             <FooterSocial />
           </div>
           <div className="footer-bottom space-between text-xxs invert-order-desktop">
             <FooterNav />
-            <div className="footer-copyright">Made by <a href="https://cruip.com">TorneosCOD</a>. All right reserved</div>
+            <div className="footer-copyright">Made by <a href="">Cod_JF</a>. Todos los derechos reservados</div>
           </div>
         </div>
       </div>

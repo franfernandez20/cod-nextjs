@@ -23,7 +23,6 @@ import { fetchAllTournaments } from "../firebase/client";
 
 export async function getServerSideProps(context) {
   const tournaments = await fetchAllTournaments()
-  console.log('tournaments', tournaments)
   
   return {
     props: {

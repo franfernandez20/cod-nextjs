@@ -75,7 +75,6 @@ const Header = ({
 
   useEffect(() => {
     if (user) hideSignin = true;
-    console.log("user", user);
   }, [user]);
 
   const openMenu = () => {
@@ -148,7 +147,6 @@ const Header = ({
   };
 
   const handleOnUserClick = () => {
-    console.log("Click");
     router.push("/settings");
   };
 
@@ -162,7 +160,7 @@ const Header = ({
           )}
         >
           {/* <Cod_JF onClick={handleLogoClick} /> */}
-          <img className="logo-header" src="/svg-fondo-trans.png" />
+          <img className="logo-header" src="/svg-fondo-trans.png" onClick={handleLogoClick} />
           {!hideNav && (
             <>
               <>

@@ -1,11 +1,43 @@
 import { XSRF_TOKEN } from "../../../../lib/api";
 
-export default function handler(req, res) {
-  const {
-    query: { userid, platform, ini, fin },
-  } = req;
+import { getTournament, getDBUser } from "../../../../firebase/client";
 
-  if (!platform) return res.end("Error - platform es necesario");
+/*
+1 punto por eliminación; con 20 puntos por una victoria, 15 por los 5 primeros, 10 por los 15 primero y 5 por los 25 primeros.
+
+1      | 20
+2-5    | 15
+6-15   | 10
+16-25  | 5
+
+1 x kill
+
+
+*/
+
+const getPoints = (kills, position) => {
+  let points = 0;
+  switch (true) {
+    case position === 1:
+      points = 20;
+      break;
+    case position > 1 && position <= 5:
+      points = 15;
+      break;
+    case position > 5 && position <= 15:
+      points = 10;
+      break;
+    case position > 15 && position <= 25:
+      points = 5;
+      break;
+    default:
+      break;
+  }
+  return points + kills;
+};
+
+const getUserMatches = (userid, platform, ini, fin) => {
+  if (!platform) throw "platform es necesario";
 
   var myHeaders = new Headers();
   myHeaders.append(
@@ -22,10 +54,7 @@ export default function handler(req, res) {
   const inisec = ini / 1000;
   const finsec = fin / 1000;
   const encodeduser = encodeURIComponent(userid);
-  fetch(
-    // `https://my.callofduty.com/api/papi-client/stats/cod/v1/title/mw/platform/psn/gamer/${userid}/profile/type/wz`,
-    // `https://my.callofduty.com/api/papi-client/stats/cod/v1/title/mw/platform/${platform}/gamer/${encodeduser}/profile/type/wz`,
-    // `https://my.callofduty.com/api/papi-client/crm/cod/v1/title/mw/platform/${platform}/gamer/${encodeduser}/matches/mp/start/0/end/0/details`,
+  return fetch(
     `https://my.callofduty.com/api/papi-client/crm/cod/v2/title/mw/platform/${platform}/gamer/${encodeduser}/matches/wz/start/0/end/0/details`,
     requestOptions
   )
@@ -33,12 +62,11 @@ export default function handler(req, res) {
     .then((result) => {
       const { status, data } = result;
       if (status === "success") {
-        console.log("status", status);
-        // const matchesOnRange = data.matches.filter(
-        //   (match) => match.utcStartSeconds > ini && match.utcStartSeconds < fin
-        // );
         const parsedMatches = data.matches.reduce((res, match) => {
-          if (match.utcStartSeconds > inisec && match.utcStartSeconds < finsec) {
+          if (
+            match.utcStartSeconds > inisec &&
+            match.utcStartSeconds < finsec
+          ) {
             const {
               utcStartSeconds,
               utcEndSeconds,
@@ -63,6 +91,7 @@ export default function handler(req, res) {
               {
                 utcStartSeconds,
                 utcEndSeconds,
+                points: getPoints(kills, teamPlacement),
                 map,
                 mode,
                 matchID,
@@ -83,9 +112,49 @@ export default function handler(req, res) {
           }
           return res;
         }, []);
-        res.end(JSON.stringify({ status, data: parsedMatches }));
+        return parsedMatches;
       }
-      res.end(JSON.stringify({ status, message: data.message }));
-    })
-    .catch((error) => res.end(JSON.stringify(error)));
+      throw "State: Error | La peticion a cod devolvio error";
+    });
+};
+
+export default async function handler(req, res) {
+  const {
+    query: { tourid },
+  } = req;
+
+  // cambiar "topay" por "payed"
+  const tour = await getTournament(tourid);
+  const promises = tour.topay.map((userid) => {
+    return new Promise((resolve) => {
+      getDBUser(userid).then((user) => {
+        getUserMatches(
+          user.gameid,
+          user.cod.platform,
+          1612120244000,//1612134244000, //sera tour.fecha
+          1612135244000//1612140205000  // sera tour.fecha + tiempo del torneo
+        )
+          .then((matches) => {
+            matches.sort((param1, param2) => param2.points - param1.points);
+            const matches3 = matches.slice(0, 3);
+            const totalPoints = matches.reduce(
+              (acc, match) => (acc += match.points),
+              0
+            );
+            const userStats = [
+              { user: user.gameid, matches: matches3, totalPoints },
+            ];
+            resolve(userStats);
+          })
+          .catch((e) => console.log(e));
+      });
+    });
+  });
+  Promise.all(promises).then((values) => {
+    console.log(values);
+    values.sort((param1, param2) => param2.totalPoints - param1.totalPoints);
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "application/json");
+    res.end(JSON.stringify(values));
+  });
 }

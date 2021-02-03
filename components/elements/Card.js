@@ -26,13 +26,10 @@ export default function Card({ tournament }) {
   const { user } = state;
 
   useEffect(() => {
-    console.log('user- card USEefffect', user)
-    if (user) {
+    if (user && user.tournaments) {
       const userTournament = user.tournaments.find((e) => e.tid === id);
-      if (userTournament) {
-        setInscribedPayed([true, userTournament.payed]);
-      } else setInscribedPayed([false, false])
-    }
+      userTournament && setInscribedPayed([true, userTournament.payed]);
+    } else setInscribedPayed([false, false])
   }, [user]);
 
   const handleTournamentSelect = () => {

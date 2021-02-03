@@ -12,7 +12,7 @@ export default function CardList({ alt, src, text, list }) {
                 <ul className="recentmatches-listing card_basic">
                   {list &&
                     list.map((tournament) => (
-                      <Card tournament={tournament} />
+                      <Card key={tournament.id} tournament={tournament} />
                     ))}
                 </ul>
               </div>

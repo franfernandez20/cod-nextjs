@@ -60,6 +60,7 @@ export const createDBUser = ({
   avatar = null,
   content = null,
   uid,
+  email,
   username,
   gameid = null,
   cod = null,
@@ -72,6 +73,7 @@ export const createDBUser = ({
       content,
       uid,
       username,
+      email,
       gameid,
       createdAt: firebase.firestore.Timestamp.fromDate(new Date()),
       cod,
@@ -116,15 +118,14 @@ export const updateDBUser = (uid, gameid, cod) => {
   );
 };
 
-const getDBUser = (uid) => {
+export const getDBUser = (uid) => {
   return dbService
     .collection("users")
     .doc(uid)
     .get()
     .then((doc) => {
-      console.log("doc", doc);
       if (doc.exists) {
-        console.log("Document data:", doc.data());
+        // console.log("Document data:", doc.data());
         const data = doc.data();
         const id = doc.id;
         const { createdAt } = data;
@@ -134,6 +135,28 @@ const getDBUser = (uid) => {
           id,
           createdAt: +createdAt.toDate(),
         };
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+        return null;
+      }
+    });
+};
+
+// TO DO - buscar como recuperar solo un campo
+const getDBUserGameId = (uid) => {
+  return dbService
+    .collection("users")
+    .doc(uid)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        console.log("Document data:", doc.data());
+        const data = doc.data();
+        const id = doc.id;
+        const { createdAt } = data;
+
+        return data
       } else {
         // doc.data() will be undefined in this case
         console.log("No such document!");
@@ -211,6 +234,58 @@ const createTournament = () => {
     });
 };
 
+
+export const getTournament = (tourid) => {
+  return dbService
+    .collection("tournament")
+    .doc(tourid)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        // console.log("Document data:", doc.data());
+        const data = doc.data();
+        const id = doc.id;
+        const { fecha } = data;
+
+        return {
+          ...data,
+          id,
+          fecha: +fecha.toDate(),
+          stats: []
+        };
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+        return null;
+      }
+    });
+};
+
+export const getTournamentWithStats = (tourid) => {
+  return dbService
+    .collection("tournament")
+    .doc(tourid)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        // console.log("Document data:", doc.data());
+        const data = doc.data();
+        const id = doc.id;
+        const { fecha } = data;
+
+        return {
+          ...data,
+          id,
+          fecha: +fecha.toDate(),
+        };
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+        return null;
+      }
+    });
+};
+
 export const fetchAllTournaments = () => {
   return dbService
     .collection("tournament")
@@ -226,6 +301,7 @@ export const fetchAllTournaments = () => {
           ...data,
           id,
           fecha: +fecha.toDate(),
+          stats: []
         };
       });
     });
@@ -285,4 +361,22 @@ export const deleteUserToTournament = (uid, tournament) => {
     .catch((e) => {
       console.log("Error guardando el user en el torneo", e);
     });
+};
+
+
+export const setTourStats = (tourid, stats) => {
+  var userRef = dbService.collection("tournament").doc(tourid);
+
+  return userRef.set(
+    {
+      stats,
+      hasStats: true
+    },
+    { merge: true }
+  ).then(function (docRef) {
+    console.log("Document written with ID: ", docRef.id);
+  })
+  .catch(function (error) {
+    console.error("Error adding document: ", error);
+  });
 };

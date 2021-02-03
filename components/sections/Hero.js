@@ -78,16 +78,11 @@ const Hero = ({
     e && e.target && setRegistroValue(e.target.value);
   };
 
-  const handleRegistroClick = (e) => {
-    console.log("clicket");
-  };
-
   const checkUser = (codUser) => {
     const { username, platform, avatar } = codUser;
     return codTournamentService
       .getUserStats(username, platform)
       .then((stats) => {
-        console.log("stats", stats);
         if (stats.status === "success") {
           const { kdRatio, deaths, kills, wins } = stats.wz.br_all.properties;
 
@@ -105,7 +100,6 @@ const Hero = ({
           };
           setLogged(newlogged);
           setResgistroResults([]);
-          console.log("newlogged", newlogged);
         } else {
           if (stats.message === "Not permitted: not allowed")
             setRegistroError("Este usuario es privado");
@@ -118,12 +112,10 @@ const Hero = ({
 
   const handleRegistroSubmit = (e) => {
     e && e.preventDefault();
-    console.log("ddd", registroValue);
     setLoading(true);
     codTournamentService
       .getUserDetails(registroValue, platform)
       .then((result) => {
-        console.log("result", result);
         if (result.length === 0) {
           setRegistroError("No se encontró el usuario");
           setLoading(false);
@@ -132,7 +124,6 @@ const Hero = ({
           setLoading(false);
         } else if (result.length === 1) {
           const codUser = result[0];
-          console.log("codUser", codUser);
           checkUser(codUser);
         }
       })
@@ -143,20 +134,11 @@ const Hero = ({
   };
 
   const handleSelectedUser = (user, e) => (e) => {
-    console.log("yessss", e);
-    console.log("yessss", user);
     setLoading(true);
     checkUser(user);
   };
 
-  const handleSubmitResults = (e) => {
-    console.log("yessss", e);
-  };
-
   const handleConfirm = () => {
-    console.log("yessss");
-    console.log("user", user);
-    console.log(logged);
     const {
       platform,
       username,
