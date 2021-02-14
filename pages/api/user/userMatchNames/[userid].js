@@ -2,11 +2,10 @@ import { XSRF_TOKEN } from "../../../../lib/api";
 
 export default function handler(req, res) {
   const {
-    query: { userid, platform, ini, fin },
+    query: { userid, platform },
   } = req;
 
   if (!platform) return res.end("Error - platform es necesario");
-
   var myHeaders = new Headers();
   myHeaders.append(
     "Cookie",
@@ -19,73 +18,30 @@ export default function handler(req, res) {
     redirect: "follow",
   };
 
-  const inisec = ini / 1000;
-  const finsec = fin / 1000;
   const encodeduser = encodeURIComponent(userid);
+
   fetch(
-    // `https://my.callofduty.com/api/papi-client/stats/cod/v1/title/mw/platform/psn/gamer/${userid}/profile/type/wz`,
-    // `https://my.callofduty.com/api/papi-client/stats/cod/v1/title/mw/platform/${platform}/gamer/${encodeduser}/profile/type/wz`,
-    // `https://my.callofduty.com/api/papi-client/crm/cod/v1/title/mw/platform/${platform}/gamer/${encodeduser}/matches/mp/start/0/end/0/details`,
-    `https://my.callofduty.com/api/papi-client/crm/cod/v2/title/mw/platform/${platform}/gamer/${encodeduser}/matches/wz/start/0/end/0/details`,
+    `https://my.callofduty.com/api/papi-client/crm/cod/v2/title/mw/platform/${platform}/gamer/${encodeduser}/matches/wz/start/0/end/1/details`,
     requestOptions
   )
     .then((response) => response.json())
     .then((result) => {
       const { status, data } = result;
-      if (status === "success") {
-        console.log("status", status);
-        // const matchesOnRange = data.matches.filter(
-        //   (match) => match.utcStartSeconds > ini && match.utcStartSeconds < fin
-        // );
-        const parsedMatches = data.matches.reduce((res, match) => {
-          // if (match.utcStartSeconds > inisec && match.utcStartSeconds < finsec) {
-            const {
-              utcStartSeconds,
-              utcEndSeconds,
-              map,
-              mode,
-              matchID,
-              privateMatch,
-            } = match;
-            const {
-              kills,
-              deaths,
-              kdRatio,
-              gulagDeaths,
-              gulagKills,
-              teamPlacement,
-              damageDone,
-              damageTaken,
-            } = match.playerStats;
-            const { team, username, uno } = match.player;
-            res = [
-              ...res,
-              {
-                utcStartSeconds,
-                utcEndSeconds,
-                map,
-                mode,
-                matchID,
-                privateMatch,
-                kills,
-                deaths,
-                kdRatio,
-                gulagDeaths,
-                gulagKills,
-                teamPlacement,
-                damageDone,
-                damageTaken,
-                team,
-                username,
-                uno,
-              },
-            ];
-          // }
-          return res;
-        }, []);
-        res.end(JSON.stringify({ status, data: parsedMatches }));
+      if (status === "success" && data && data.matches && data.matches) {
+        const { username, uno } = data.matches[0].player;
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify({ username, uno }));
+      } else {
+        res.status(405)
+        data.message && res.json({ user: encodeduser, platform, type: data.type, message: data.message});
+        return res.end(JSON.stringify("Usuario no encontrado")); //in case something goes wrong in the catch block
       }
-      res.end(JSON.stringify({ status, message: data.message }));
     })
-    .catch((error) => res.end(JSON.stringify(error)));
+    .catch((error) => {
+      console.log("error", error);
+      res.json(error);
+      res.status(405).end();
+      return res.end(JSON.stringify("mierda")); //in case something goes wrong in the catch block
+    });
 }

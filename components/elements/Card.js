@@ -74,7 +74,7 @@ export default function Card({ tournament }) {
                     )}
                     <div className="match-details-listing__placement warzone loss">
                       <span className="text-color-success">
-                        {total > 48 ? total : 48}
+                        {total}
                       </span>
                       <span className="text-color-low">/150</span>
                     </div>

@@ -106,13 +106,21 @@ export const unregisterUser = (uid, gameid) => {
   );
 };
 
-export const updateDBUser = (uid, gameid, cod) => {
+export const updateDBUser = (
+  uid,
+  gameid,
+  secondaryGameId = "",
+  unoId = "",
+  cod
+) => {
   var userRef = dbService.collection("users").doc(uid);
 
   return userRef.set(
     {
+      gameid: gameid,
+      secondaryGameId,
+      unoId,
       cod: cod,
-      gameid: gameid
     },
     { merge: true }
   );
@@ -143,7 +151,9 @@ export const getDBUser = (uid) => {
     });
 };
 
-// TO DO - buscar como recuperar solo un campo
+/**
+ * TO DO - buscar como traer solo el gameid de la db 
+ */
 const getDBUserGameId = (uid) => {
   return dbService
     .collection("users")
@@ -153,10 +163,7 @@ const getDBUserGameId = (uid) => {
       if (doc.exists) {
         console.log("Document data:", doc.data());
         const data = doc.data();
-        const id = doc.id;
-        const { createdAt } = data;
-
-        return data
+        return data.gameid
       } else {
         // doc.data() will be undefined in this case
         console.log("No such document!");
@@ -186,31 +193,7 @@ export const fetchAllUsers = () => {
 };
 
 const torn1 = {
-  fecha: firebase.firestore.Timestamp.fromDate(new Date("2021/02/14 17:00:00")),
-  visible: true,
-  kdmax: 2.0,
-  prize: 5,
-  modo: "Tríos",
-  format: "Standar",
-  mapa: "Verdansk",
-  region: "UE",
-  payed: [],
-  topay: [],
-};
-const torn2 = {
-  fecha: firebase.firestore.Timestamp.fromDate(new Date("2021/02/21 17:00:00")),
-  visible: true,
-  kdmax: 2.0,
-  prize: 5,
-  modo: "Tríos",
-  format: "Standar",
-  mapa: "Verdansk",
-  region: "UE",
-  payed: [],
-  topay: [],
-};
-const torn3 = {
-  fecha: firebase.firestore.Timestamp.fromDate(new Date("2021/02/28 17:00:00")),
+  fecha: firebase.firestore.Timestamp.fromDate(new Date("2021/02/07 20:00:00")),
   visible: true,
   kdmax: 2.0,
   prize: 5,
@@ -222,10 +205,11 @@ const torn3 = {
   topay: [],
 };
 
-const createTournament = () => {
+
+export const createTournament = (tour) => {
   return dbService
     .collection("tournament")
-    .add(torn3)
+    .add(tour)
     .then(function (docRef) {
       console.log("Document written with ID: ", docRef.id);
     })
@@ -308,8 +292,9 @@ export const fetchAllTournaments = () => {
 };
 
 export const inscribeUserToTournament = (uid, tournament) => {
+  console.log('inscribeUserToTournament')
   const { id: tid, topay } = tournament;
-  if (topay.includes(uid)) return (new Promise(() => undefined))
+  if (topay.includes(uid)) return (new Promise(() => undefined)).then((a)=> console.log("Error: User already inscribed"))
   var tournamentRef = dbService.collection("tournament").doc(tid);
 
   return tournamentRef
@@ -380,3 +365,166 @@ export const setTourStats = (tourid, stats) => {
     console.error("Error adding document: ", error);
   });
 };
+
+
+//TO COMPLETE
+export const getUserTeams = (userid, tourid) => {
+  return dbService
+    .collection("tournament")
+    .doc(tourid)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        // console.log("Document data:", doc.data());
+        const data = doc.data();
+        const id = doc.id;
+        
+        
+        getUserTeams(id)
+
+        return {
+          ...data,
+          id,
+        };
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+        return null;
+      }
+    });
+};
+
+/**
+ * TO BE COMPLETED
+ * @param {*} teamid 
+ * @param {*} userid 
+ */
+export const getUserTeam = (teamid, userid) => {
+  return dbService
+    .collection("teams")
+    .doc(teamid)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        // console.log("Document data:", doc.data());
+        const data = doc.data();
+        const { users } = data;
+        if (users.includes(userid)) {
+          const promises = users.map(user => getDBUserGameId(user)) 
+          return Promise.all(promises)
+        }
+        else return []
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+        return null;
+      }
+    });
+  };
+  
+  /**
+   * Busca un team con ese nombre
+   * solo busca equipos con ese tourid
+   * TODO paralelizar las segundas peticiones
+   */
+  export const getTeamByName = (lookTeamName, tourid) => {
+    return dbService
+      .collection("teams")
+      .where("tourid", "==", tourid)
+      .where("teamName", "==", lookTeamName)
+      .get()
+      .then((query) => {
+        let teams = [];
+        query.forEach((doc) => {
+          // doc.data() is never undefined for query doc snapshots
+          console.log(doc.id, " => ", doc.data());
+          const { teamName, tourid, users } = doc.data();
+          teams = [{ teamid: doc.id, teamName, tourid, users }, ...teams];
+        });
+        return teams;
+      })
+      .catch(function (error) {
+        console.log("Error getting documents: ", error);
+      });
+  };
+
+  /**
+   * Importante hay que pasarle el objeto a buscar completo
+   * @param {*} userid 
+   * @param {*} tourid 
+   */
+  export const getUserTeamByTour = (userid, gameid, secondaryGameId, tourid) => {
+    return dbService
+      .collection("teams")
+      .where("tourid", "==", tourid)
+      .where("users", "array-contains", { gameid, user: userid, secondaryGameId })
+      .get()
+      .then((query) => {
+        let teams = [];
+        query.forEach((doc) => {
+          // doc.data() is never undefined for query doc snapshots
+          console.log(doc.id, " => ", doc.data());
+          const { teamName, tourid, users } = doc.data();
+          teams = [{ teamid: doc.id, teamName, tourid, users }, ...teams];
+        });
+        return teams;
+      })
+      .catch(function (error) {
+        console.log("Error getting documents: ", error);
+      });
+  };
+
+
+  export const inscribeTeam = (team) => {
+    if (team.teamid)
+      return dbService
+        .collection("teams")
+        .doc(team.teamid)
+        .set(team, { merge: true });
+    else
+      return dbService
+        .collection("teams")
+        .add(team)
+        .then(function (docRef) {
+          console.log("Document written with ID: ", docRef.id);
+        })
+        .catch(function (error) {
+          console.error("Error adding document: ", error);
+        });
+  };
+  
+  /**
+   * Get all teams of a tour
+   * @param {} tourid 
+   */
+  export const getTourTeams = (tourid) => {
+    return dbService
+      .collection("teams")
+      .where("tourid", "==", tourid)
+      .get()
+      .then((query) => {
+        let teams = [];
+        query.forEach((doc) => {
+          // doc.data() is never undefined for query doc snapshots
+          // console.log(doc.id, " => ", doc.data());
+          const { teamName, tourid, users } = doc.data();
+          teams = [{ teamid: doc.id, teamName, tourid, users }, ...teams];
+        });
+        return teams;
+      })
+      .catch(function (error) {
+        console.log("Error getting documents: ", error);
+      });
+  };
+
+
+
+  // br_brtrios
+  // br_brduos
+
+  // brtdm_wzrumval2
+
+
+  // slori3577
+  // lukydog83
+  // MAREMMAMAIALA

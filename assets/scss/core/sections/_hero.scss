@@ -124,6 +124,42 @@
 		align-items: baseline;
 		justify-content: center;
 	}
+
+	.select {
+		display:inline-block;
+		padding:0.20em 0.6em;
+		border:0.1em solid #9CA9B3;
+		margin:0 0.3em 0.3em 0;
+		border-radius:0.12em;
+		box-sizing: border-box;
+		text-decoration:none;
+		// font-family:'Roboto',sans-serif;
+		font-weight:300;
+		color:#FFFFFF;
+		text-align:center;
+		transition: all 0.2s;		
+	}
+	.select-press{
+		color:#000000;
+		background-color:#9CA9B3;
+	}
+	
+	.teamGroup {
+		
+		background-color:#dde2e6;
+		border-radius:0.12em;
+		
+	}
+	.teamGroupComplete {
+		background-color:#3c3e41;
+		border-radius:0.12em;
+		
+	}
+	.teamGroup:hover {
+		background-color:#9CA9B3;
+		cursor: pointer;
+		
+	}
 }
 
 
@@ -656,3 +692,5 @@
 	}
 
 }
+
+

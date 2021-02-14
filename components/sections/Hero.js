@@ -85,21 +85,26 @@ const Hero = ({
       .then((stats) => {
         if (stats.status === "success") {
           const { kdRatio, deaths, kills, wins } = stats.wz.br_all.properties;
-
-          const mapAvatar =
-            avatar && avatar.avatarUrlLargeSsl
-              ? avatar.avatarUrlLargeSsl
-              : avatar;
-          const newlogged = {
-            ...codUser,
-            kdRatio,
-            deaths,
-            kills,
-            wins,
-            avatar: mapAvatar,
-          };
-          setLogged(newlogged);
-          setResgistroResults([]);
+          codTournamentService
+            .getUserMatchNames(registroValue, platform)
+            .then((userNames) => {
+              const mapAvatar =
+                avatar && avatar.avatarUrlLargeSsl
+                  ? avatar.avatarUrlLargeSsl
+                  : avatar;
+              const newlogged = {
+                ...codUser,
+                kdRatio,
+                deaths,
+                kills,
+                wins,
+                avatar: mapAvatar,
+                secondaryGameId: userNames.username,
+                unoId: userNames.uno
+              };
+              setLogged(newlogged);
+              setResgistroResults([]);
+            });
         } else {
           if (stats.message === "Not permitted: not allowed")
             setRegistroError("Este usuario es privado");
@@ -148,6 +153,8 @@ const Hero = ({
       deaths,
       kills,
       wins,
+      secondaryGameId,
+      unoId
     } = logged;
     const cod = {
       platform,
@@ -161,9 +168,11 @@ const Hero = ({
     const newuser = {
       ...user,
       gameid: username,
+      secondaryGameId,
+      unoId,
       cod,
     };
-    updateDBUser(user.id, username, cod);
+    updateDBUser(user.id, username, secondaryGameId, unoId, cod);
     updateUser(newuser);
     closeRegistroModal();
   };

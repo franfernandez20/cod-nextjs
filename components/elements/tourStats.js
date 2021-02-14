@@ -70,12 +70,12 @@ const TourStats = ({
                 <div class="stat-summary__wrapper">
                   <ul class="stat-summary-listing stat-summary__left">
                     <li class="stat-summary-listing__item">
-                      {stat.matches[0].id.map((userName) => {
+                      {stat.team.users.map((user) => {
                         return (
                         <div className="user-wrapper">
                           <UserIcon fill="black" className={idx === 0 ? "user-icon-winner" : "user-icon"}/> 
                           <p className={idx === 0 ? "winners" : "users"}>
-                            {userName}
+                            {user.gameid}
                           </p>
                         </div>
                         );
@@ -90,7 +90,7 @@ const TourStats = ({
                     <li class="stat-summary-listing__item">
                       <div class={classNames(getClassesLabel(idx))}>Puntos</div>{" "}
                       <div class={getClassesStat(idx)}>
-                        {stat.totalTourPoints}
+                        {stat.totalPoints}
                       </div>
                     </li>{" "}
                     {stat.matches.map((match) => {
@@ -101,10 +101,10 @@ const TourStats = ({
                           </div>
                           <div class={getClassesStat(idx)}>
                             <span className="item-left">
-                              {match.totalTeamPoints}
+                              {match.points}
                             </span>
                             <span className="item-right">
-                              {match.team[0].teamPlacement}º
+                              {match.teamPlacement}º
                             </span>
                           </div>
                         </li>
