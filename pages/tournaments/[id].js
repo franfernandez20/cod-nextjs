@@ -84,9 +84,9 @@ const SearchTeam = ({ tourid, tourModo, onTeamSelected }) => {
 
   // To improve.. using 2times
   const teamComplete = (teamLength) => {
-    if (teamLength === 2 && tourModo === "Duós") return true;
-    if (teamLength === 3 && tourModo === "Tríos") return true;
-    if (teamLength === 4 && tourModo === "Cuartetos") return true;
+    if (teamLength === 2 && tourModo === "br_brduos") return true;
+    if (teamLength === 3 && tourModo === "br_brtrios") return true;
+    if (teamLength === 4 && tourModo === "br_brquads") return true;
     return false;
   };
 
