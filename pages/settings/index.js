@@ -37,7 +37,7 @@ export default function Settings() {
                   disabled={user.tournaments.length > 0}
                   wideMobile
                 >
-                  Borrar cuenta asociada
+                  Borrar GameId asociado
                 </Button>
                 <span className="text-color-secondary font-elect margin-left-64-desktop">
                   {user.gameid}

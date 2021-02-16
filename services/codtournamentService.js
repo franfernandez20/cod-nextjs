@@ -41,7 +41,7 @@ export const getUserMatchNames = (gamerId, platform='psn') => {
     });
 };
 
-export const getTourStats = (hostid, platform='psn') => {
+export const getTourStats = (tourid) => {
   const gameIdEncode = encodeURIComponent(gamerId)
   const url = `${api_url}user/userstats/${gameIdEncode}?platform=${platform}`;
 

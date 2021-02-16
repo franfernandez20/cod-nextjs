@@ -5,6 +5,7 @@ import {
   setTourStats,
   getDBUser,
   getTourTeams,
+  updateAllUsersTour
 } from "../../../../firebase/client";
 
 /*
@@ -176,7 +177,7 @@ const getMatchTeamStats = (matchID, team, resolve) => {
     .catch((error) => console.log("Error getting fullMatch", error));
 };
 
-const getUserMatches = (userid, platform, ini, fin) => {
+const getUserMatches = (userid, platform, modo, ini, fin) => {
   console.log("platform", platform);
   console.log("userid", userid);
   if (!platform) throw "platform es necesario";
@@ -209,7 +210,7 @@ const getUserMatches = (userid, platform, ini, fin) => {
           if (
             match.utcStartSeconds > inisec &&
             match.utcStartSeconds < finsec &&
-            match.mode === "br_brtrios" // Preparar para mete el modo del torneo
+            match.mode === modo // Preparar para mete el modo del torneo
           ) {
             const { matchID } = match;
             const { team } = match.player;
@@ -232,9 +233,8 @@ export default async function handler(req, res) {
   } = req;
 
   // cambiar "topay" por "payed"
-  // const tour = await getTournament(tourid);
+  const fullTour = await getTournament(tourid);
   const tourTeams = await getTourTeams(tourid);
-  console.log("tourTeams", tourTeams);
   const promises = tourTeams.map((team) => {
     return new Promise((resolve) => {
       if (team.users && team.users.length > 0) {
@@ -243,10 +243,11 @@ export default async function handler(req, res) {
             getUserMatches(
               user.gameid,
               user.cod.platform,
-              new Date("02/14/2021 14:30:00").getTime(),
-              new Date("02/14/2021 18:30:00").getTime()
-              // 1612120244000,//1612134244000, //sera tour.fecha
-              // 1612135244000//1612140205000  // sera tour.fecha + tiempo del torneo
+              fullTour.modo,
+              new Date(fullTour.fecha).getTime(),
+              (new Date(fullTour.fecha).getTime()) + fullTour.duration * 60 * 60 * 1000,
+              // new Date("02/15/2021 18:00:00").getTime(),
+              // new Date("02/15/2021 19:00:00").getTime()
             )
               .then((promises2) => {
                 Promise.all(promises2)
@@ -298,7 +299,6 @@ export default async function handler(req, res) {
     });
   });
 
-  console.log("----------->", promises);
   Promise.all(promises)
     .then((teamsStats) => {
       console.log(teamsStats);
@@ -311,6 +311,8 @@ export default async function handler(req, res) {
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       setTourStats(tourid, stats);
+      updateAllUsersTour(tourid, true)
+      updateAllUsersTour(tourid, false)
       res.end(JSON.stringify(stats));
     })
     .catch((e) => console.log(e));

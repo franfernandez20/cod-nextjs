@@ -207,6 +207,7 @@ const torn1 = {
 
 
 export const createTournament = (tour) => {
+  tour.fecha = firebase.firestore.Timestamp.fromDate(tour.fecha)
   return dbService
     .collection("tournament")
     .add(tour)
@@ -517,6 +518,36 @@ export const getUserTeam = (teamid, userid) => {
       });
   };
 
+
+  export const updateAllUsersTour = (tourid, imp) => {
+    console.log("tourid", tourid);
+    return (
+      dbService
+        .collection("users")
+        .where("tournaments", "array-contains", {
+          tid: tourid,
+          payed: imp,
+        })
+        .get()
+        .then((snapshot) => {
+          const promises = [];
+          snapshot.forEach((doc) => {
+            promises.push(
+              doc.ref.update({
+                tournaments: firebase.firestore.FieldValue.arrayRemove({
+                  tid: tourid,
+                  payed: imp,
+                }),
+              })
+            );
+          });
+          return Promise.all(promises);
+        }).then(r=> console.log("------>",r))
+        .catch(function (error) {
+          console.log("Error getting documents: ", error);
+        })
+    );
+  };
 
 
   // br_brtrios
