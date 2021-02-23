@@ -227,6 +227,14 @@ const Header = ({
                       </Link>
                     </li>
                   </ul> */}
+                  <div className="header-nav-links">
+                      <div className="header-link">
+                        <Link href="/reglamento" classNames="text-xs" >Reglamento</Link>
+                      </div>
+                      <div className="header-link">
+                        <Link href="#0" classNames="text-xs" >Sobre nosotros</Link>
+                      </div>
+                    </div>
                   {!user || !user.username ? (
                     <ul className="list-reset header-nav-right">
                       <li>
@@ -270,6 +278,7 @@ const Header = ({
                           </Button>
                         </li>
                       </ul>
+                      <p></p>
                     </>
                   )}
                 </div>

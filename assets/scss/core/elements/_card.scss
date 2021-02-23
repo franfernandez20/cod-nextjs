@@ -224,7 +224,7 @@ ol, ul {
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
-    opacity: .25;
+    opacity: .15;
     z-index: 0;
 }
 
@@ -286,11 +286,30 @@ ol, ul {
 
 .match-details-listing .match-details-listing__mode, .match-details-listing .match-details-listing__timestamp {
     color: #777777;
+
+    .fecha-content {
+        background: radial-gradient(
+            circle farthest-corner at center center,
+            rgba(109, 109, 109, 0.46),
+            rgba(70, 70, 70, 0.357),
+            rgba(51, 51, 51, 0)
+        ) no-repeat;
+        
+        p {
+            color: #fff;
+            font-weight: 900;
+            margin-left: 0px;
+            margin-top: 0;
+            margin-right: 16px;
+            text-align: center;
+        }
+    }
+
 }
 
 .match-details-listing .match-details-listing__timestamp, .match-details-listing .match-details-listing__timestamp {
     font-weight: 500;
-    letter-spacing: .5px;
+    letter-spacing: 3.5px;
 }
 
 .match-details-listing .match-details-listing__placement .loss, .match-details-listing .match-details-listing__placement .loss {
@@ -368,6 +387,7 @@ ol, ul {
     overflow: hidden;
     letter-spacing: 0;
     font-size: 18px;
+    text-align: center;
 }
 .match-stats-listing .match-stats-listing__title {
     position: relative;
@@ -493,6 +513,100 @@ ol, ul {
         height: 110px;
         margin-right: 17px;
     }
+
+    .match-details-listing .match-details-listing__mode, .match-details-listing .match-details-listing__timestamp {
+    
+        .fecha-content {
+            p {
+                margin-bottom: 0px;
+            }
+        }
+    
+    }
+
+    .premio__placement {
+        // color: #d5000075;
+        // border: 2.2px solid #a70a0a8a;
+        background-color: rgba(67, 68, 68, 0.453);
+        display: -moz-box;
+        display: -ms-flexbox;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        display: flex;
+        align-items: center;
+        position: absolute;
+        top: 110px;
+        right: 10px;
+        text-align: center;
+        width: 215px;
+        height: 50px;
+        text-transform: uppercase;
+        z-index: 3;
+        font-weight: 800;
+        font-size: 24px;
+
+        text-align:center;
+        color:rgb(221, 232, 25);
+        font-weight:900;
+        font-size:22px;
+        overflow:hidden;
+          
+          div {
+            display:inline-block;
+            overflow:hidden;
+            white-space:nowrap;
+          }
+          
+          div:first-of-type {    /* For increasing performance 
+                                 ID/Class should've been used. 
+                                 For a small demo 
+                                 it's okaish for now */
+            animation: showup 7s infinite;
+          }
+          
+          div:last-of-type {
+            width:0px;
+            animation: reveal 7s infinite;
+          }
+          
+          div:last-of-type span {
+            margin-left:-100px;
+            animation: slidein 7s infinite;
+          }
+          
+          @keyframes showup {
+              0% {opacity:0;}
+              20% {opacity:1;}
+              80% {opacity:1;}
+              100% {opacity:0;}
+          }
+          
+          @keyframes slidein {
+              0% { margin-left:-400px; }
+              20% { margin-left:-400px; }
+              35% { margin-left:0px; }
+              100% { margin-left:0px; }
+          }
+          
+          @keyframes reveal {
+              0% {opacity:0;width:0px;}
+              20% {opacity:1;width:0px;}
+              30% {width:125px;}
+              80% {opacity:1;}
+              100% {opacity:0;width:100px;}
+          }
+          
+          
+          p {
+            font-size:12px;
+            color:#999;
+            margin-top:5px;
+          }
+
+    }
 }
 
 @include media( '<=medium' ) {
@@ -520,17 +634,103 @@ ol, ul {
     }
 
     .match-details-listing__content .match-details-listing__timestamp {
-        margin-top: -8px;
+        margin-top: -4px;
+
+        p {
+            color: #fff;
+            margin-left: 0px;
+            margin-top: 0;
+            margin-right: 16px;
+            margin-bottom: -10px;
+            text-align: center;
+        }
     }
 }
 
 @include media( '<=medium' ) {
     .match-details-listing .match-details-listing__placement, .match-details-listing .match-details-listing__placement {
-        top: 15px;
-        right: 15px;
-        width: 65px;
+        top: 9px;
+        right: 7px;
+        width: 58px;
         height: 28px;
         font-size: 13px;
+    }
+    .premio__placement {
+        // color: #d5000075;
+        // border: 2.2px solid #a70a0a8a;
+        background-color: rgba(67, 68, 68, 0.453);
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        display: flex;
+        align-items: center;
+        position: absolute;
+        top: 137px;
+        right: 0px;
+        width: 210px;
+        height: 37px;
+        text-transform: uppercase;
+        z-index: 3;
+
+        text-align:center;
+        color:rgb(221, 232, 25);
+        font-weight:900;
+        font-size:22px;
+        overflow:hidden;
+          
+          div {
+            display:inline-block;
+            overflow:hidden;
+            white-space:nowrap;
+          }
+          
+          div:first-of-type {    /* For increasing performance 
+                                 ID/Class should've been used. 
+                                 For a small demo 
+                                 it's okaish for now */
+            animation: showup 7s infinite;
+          }
+          
+          div:last-of-type {
+            width:0px;
+            animation: reveal 7s infinite;
+          }
+          
+          div:last-of-type span {
+            margin-left:-100px;
+            animation: slidein 7s infinite;
+          }
+          
+          @keyframes showup {
+              0% {opacity:0;}
+              20% {opacity:1;}
+              80% {opacity:1;}
+              100% {opacity:0;}
+          }
+          
+          @keyframes slidein {
+              0% { margin-left:-400px; }
+              20% { margin-left:-400px; }
+              35% { margin-left:0px; }
+              100% { margin-left:0px; }
+          }
+          
+          @keyframes reveal {
+              0% {opacity:0;width:0px;}
+              20% {opacity:1;width:0px;}
+              30% {width:125px;}
+              80% {opacity:1;}
+              100% {opacity:0;width:100px;}
+          }
+          
+          
+          p {
+            font-size:12px;
+            color:#999;
+            margin-top:5px;
+          }
+
     }
 }
 

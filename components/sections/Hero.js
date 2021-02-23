@@ -1,22 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import useUser from "../../hooks/useUser";
 import classNames from "classnames";
 
 import { SectionProps } from "../../utils/SectionProps";
 import ButtonGroup from "../elements/ButtonGroup";
 import Button from "../elements/Button";
-import Image from "../elements/Image";
 import Modal from "../elements/Modal";
 import Input from "../elements/Input";
 
-import {
-  loginWithGoogle,
-  logOutFromGoogle,
-  updateDBUser,
-} from "../../firebase/client";
-import * as codtrackerService from "../../services/codtrackerService";
+import { updateDBUser } from "../../firebase/client";
 import * as codTournamentService from "../../services/codtournamentService";
-import Checkbox from "../elements/Checkbox";
 
 const propTypes = {
   ...SectionProps.types,
@@ -100,7 +93,7 @@ const Hero = ({
                 wins,
                 avatar: mapAvatar,
                 secondaryGameId: userNames.username,
-                unoId: userNames.uno
+                unoId: userNames.uno,
               };
               setLogged(newlogged);
               setResgistroResults([]);
@@ -154,7 +147,7 @@ const Hero = ({
       kills,
       wins,
       secondaryGameId,
-      unoId
+      unoId,
     } = logged;
     const cod = {
       platform,

@@ -5,7 +5,7 @@ import {
   setTourStats,
   getDBUser,
   getTourTeams,
-  updateAllUsersTour
+  updateAllUsersTour,
 } from "../../../../firebase/client";
 
 /*
@@ -148,7 +148,16 @@ const getMatchTeamStats = (matchID, team, resolve) => {
       if (status === "success") {
         const teamMatch = data.allPlayers.reduce((acc, elem) => {
           const { player, playerStats } = elem;
-          if (player.team === team) {
+          /**
+           * BUG - team duplicados COD API
+           * comprobar si llevan mucho teamSurvivalTime pero no tienen
+           * puntos les sacamos del equipo
+           */
+          if (
+              player.team === team &&
+              (!(playerStats.teamSurvivalTime > 400000) ||
+            !(playerStats.matchXp === 0))
+          ) {
             // Tocar por aqui para sacar más stats de la partida
             acc = [
               ...acc,
@@ -171,6 +180,12 @@ const getMatchTeamStats = (matchID, team, resolve) => {
           points,
           teamMatch,
         };
+        // if (matchID === '17155408150960189801') {
+        //   console.log('--Log machtId-----', matchID)
+        //   console.log('-------')
+        //   console.log('team -->', teamMatchStats)
+        //   console.log('-----------')
+        // }
         resolve(teamMatchStats);
       } else console.log("Error getting fullMatch bad response");
     })
@@ -245,7 +260,8 @@ export default async function handler(req, res) {
               user.cod.platform,
               fullTour.modo,
               new Date(fullTour.fecha).getTime(),
-              (new Date(fullTour.fecha).getTime()) + fullTour.duration * 60 * 60 * 1000,
+              new Date(fullTour.fecha).getTime() +
+                fullTour.duration * 60 * 60 * 1000
               // new Date("02/15/2021 18:00:00").getTime(),
               // new Date("02/15/2021 19:00:00").getTime()
             )
@@ -256,6 +272,9 @@ export default async function handler(req, res) {
                       let correct = true;
                       if (match.teamMatch.length !== team.users.length)
                         correct = false;
+                      // if (match.teamMatch[1].username === "Lagildaeslibre") {
+                      //   correct = true;
+                      // } 
                       else {
                         team.users.forEach((user) => {
                           if (
@@ -285,7 +304,6 @@ export default async function handler(req, res) {
                         totalPoints,
                       },
                     ];
-                    console.log("userStats", userStats);
                     resolve(userStats);
                   })
                   .catch((e) => console.log(e));
@@ -311,8 +329,8 @@ export default async function handler(req, res) {
       res.statusCode = 200;
       res.setHeader("Content-Type", "application/json");
       setTourStats(tourid, stats);
-      updateAllUsersTour(tourid, true)
-      updateAllUsersTour(tourid, false)
+      updateAllUsersTour(tourid, true);
+      updateAllUsersTour(tourid, false);
       res.end(JSON.stringify(stats));
     })
     .catch((e) => console.log(e));

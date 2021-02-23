@@ -160,6 +160,41 @@
 		cursor: pointer;
 		
 	}
+
+	.svg-description {
+		display: inline;
+		margin-right: 6px;
+	}
+
+	@include media( '<medium' ) {
+		.tour-description {
+			text-align: left;
+			
+			.tittle {
+				text-decoration: underline;
+				margin: 8px;
+			}
+			
+			li {
+				font-size: 15px;
+				margin-bottom: 2px;
+			}
+		}
+	}
+	@include media( '>medium' ) {
+		.tour-description {
+			text-align: left;
+			
+			.tittle {
+				text-decoration: underline;
+				margin: 8px;
+			}
+			li {
+				font-size: 20px;
+				margin-bottom: 2px;
+			}
+		}
+	}
 }
 
 

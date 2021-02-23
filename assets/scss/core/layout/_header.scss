@@ -124,7 +124,15 @@
 
 @include media( '<=medium' ) {
 
-	
+	.header-nav-links {
+		text-align: center;
+
+		.header-link {
+			margin-bottom: 12px;
+			@include divider(after);
+		}
+	}
+
 	.header-nav-user {
 		p {
 			font-size: small;
@@ -196,6 +204,21 @@
 
 @include media( '>medium' ) {
 
+	.header-nav-links {
+		display: flex;
+		text-align: right;
+		margin-left: 24px;
+
+		.header-link::after {
+			content: "";
+			background-color: #5658dd;
+			position: absolute;
+			width: 2px;
+			height: 33px;
+			top: 23px;
+		}
+	}
+
 	.site-header {
 
 		+ .site-content {
@@ -251,7 +274,6 @@
 }
 
 .initial {
-
 
 	display: grid;
 	margin-left: 10px;

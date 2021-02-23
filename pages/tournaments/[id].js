@@ -54,11 +54,18 @@ const ChooseTeam = ({ team }) => {
   );
 };
 
-const SearchTeam = ({ tourid, tourModo, onTeamSelected }) => {
+const SearchTeam = ({
+  tourid,
+  userKD,
+  tourMaxKD,
+  tourModo,
+  onTeamSelected,
+}) => {
   const [searchModal, setSearchModal] = useState(true);
+  const [createModalActive, setCreateModalActive] = useState(false);
   const [teamName, setTeamName] = useState("");
   const [teamsFound, setTeamsFound] = useState([]);
-  const [registroError, setRegistroError] = useState(false);
+  const [registroError, setRegistroError] = useState("");
 
   const handleGameIdChange = (e) => {
     e.preventDefault();
@@ -67,19 +74,41 @@ const SearchTeam = ({ tourid, tourModo, onTeamSelected }) => {
 
   const handleRegistroSubmit = (e) => {
     e && e.preventDefault();
-    setRegistroError(false);
+    setRegistroError("");
     setTeamsFound([]);
 
     if (searchModal)
       getTeamByName(teamName, tourid).then((result) => {
-        result.length === 0 ? setRegistroError(true) : setTeamsFound(result);
+        result.length === 0
+          ? setRegistroError("No se encontró el Team")
+          : setTeamsFound(result);
       });
-    else onTeamSelected({ teamName: teamName, tourid, users: [] });
+    else if (userKD > tourMaxKD * 0.4) {
+      setRegistroError("Superas el K/D para apuntarte a este torneo");
+    } else setCreateModalActive(true);
   };
 
   const handleSelectTeam = (team) => (e) => {
     e && e.preventDefault();
-    !teamComplete(team.users.length) && onTeamSelected(team);
+    if (teamComplete(team.users.length)) {
+      setRegistroError("Este equipo esta completo");
+    } else if (team.teamKD + userKD > tourMaxKD) {
+      setRegistroError(
+        "No puedes unirte a este equipo, superaís el K/D máximo"
+      );
+    } else {
+      onTeamSelected(team);
+    }
+  };
+
+  const handleCreateTeam = (e) => {
+    e && e.preventDefault();
+    onTeamSelected({ teamName: teamName, teamKD: 0, tourid, users: [] });
+  };
+  const closeCreateModal = (e) => {
+    e && e.preventDefault();
+    setTeamName("");
+    setCreateModalActive(false);
   };
 
   // To improve.. using 2times
@@ -118,9 +147,7 @@ const SearchTeam = ({ tourid, tourModo, onTeamSelected }) => {
           </span>
         </div>
         <p className="mb-16 text-sm">Introduce nombre del equipo</p>
-        {registroError && (
-          <p className="text-color-error"> No se encontró el Team</p>
-        )}
+        {registroError && <p className="text-color-error"> {registroError}</p>}
       </div>
       <form onSubmit={handleRegistroSubmit}>
         <>
@@ -171,6 +198,22 @@ const SearchTeam = ({ tourid, tourModo, onTeamSelected }) => {
           >
             {searchModal ? "Buscar" : "Crear"}
           </Button>
+          <Modal show={createModalActive} handleClose={closeCreateModal}>
+            <p className="mb-8 text-sm">Vas a crear un nuevo Team</p>
+            <h4 className="mt-0">{teamName}</h4>
+            <Button
+              className="mr-8"
+              tag="a"
+              color="primary"
+              size="sm"
+              onClick={handleCreateTeam}
+            >
+              Confirmar
+            </Button>
+            <Button tag="a" size="sm" color="error" onClick={closeCreateModal}>
+              Cancelar
+            </Button>
+          </Modal>
         </>
         {teamsFound.map((team) => {
           return (
@@ -291,7 +334,12 @@ export default function Tournaments({
   const checkUserTeam = () => {
     console.log("tournament", tournament);
 
-    getUserTeamByTour(user.id, user.gameid, user.secondaryGameId, tournament.id).then((team) => {
+    getUserTeamByTour(
+      user.id,
+      user.gameid,
+      user.secondaryGameId,
+      tournament.id
+    ).then((team) => {
       console.log("team", team);
       team.length > 0 && setUserTeam(team[0]);
     });
@@ -305,7 +353,7 @@ export default function Tournaments({
 
   const loadTourStats = () => {
     getTournamentWithStats(tournament.id).then((tour) => {
-      setTourState(tourStates.FINISHED);
+      tour.stats && tour.stats.length > 0 && setTourState(tourStates.FINISHED);
       console.log("tour", tour);
       setStats(tour.stats);
     });
@@ -315,9 +363,8 @@ export default function Tournaments({
     const now = new Date().getTime();
     const halfhour = 30 * 60 * 1000;
     if (tournament && now > tournament.fecha) {
-      now - halfhour > tournament.fecha
-        ? loadTourStats()
-        : setTourState(tourStates.JUST_FINISH);
+      setTourState(tourStates.JUST_FINISH);
+      now - halfhour > tournament.fecha && loadTourStats();
     }
   };
 
@@ -380,7 +427,12 @@ export default function Tournaments({
 
   const handleTeamSelected = (team) => {
     setHasTeam(true);
-    team.users.push({ user: user.id, gameid: user.gameid, secondaryGameId: user.secondaryGameId });
+    team.users.push({
+      user: user.id,
+      gameid: user.gameid,
+      secondaryGameId: user.secondaryGameId,
+    });
+    team.teamKD = team.teamKD + user.cod.kdRatio;
     setUserTeam(team);
   };
 
@@ -390,6 +442,8 @@ export default function Tournaments({
         <SearchTeam
           tourid={tournament.id}
           tourModo={tournament.modo}
+          tourMaxKD={tournament.kdmax}
+          userKD={user.cod.kdRatio}
           onTeamSelected={handleTeamSelected}
         />
       );
@@ -428,6 +482,17 @@ export default function Tournaments({
       "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum — semper quis lectus nulla at volutpat diam ut venenatis.",
   };
 
+  const svgItem = (
+    <svg
+      width="16"
+      height="12"
+      xmlns="http://www.w3.org/2000/svg"
+      className="svg-description"
+    >
+      <path d="M9 5H1c-.6 0-1 .4-1 1s.4 1 1 1h8v5l7-6-7-6v5z" fill="#376DF9" />
+    </svg>
+  );
+
   return (
     <section {...props} className={outerClasses}>
       {tournament && (
@@ -464,7 +529,10 @@ export default function Tournaments({
                             {userTeam.teamName}
                           </h4>
                           {userTeam.users.map((user) => (
-                            <p className="text-color-low mt-0 mb-0">
+                            <p
+                              key={user.gameid}
+                              className="text-color-low mt-0 mb-0"
+                            >
                               {user.gameid}
                             </p>
                           ))}
@@ -517,14 +585,23 @@ export default function Tournaments({
                 </Modal>
               </div>
             )}
-            {tourState === tourStates.JUST_FINISH && (
-              <div>
-                <p> Estamos esperando los resultados</p>
-              </div>
-            )}
             {stats && tourState === tourStates.FINISHED && (
               <div>
                 <TourStats stats={stats} />
+              </div>
+            )}
+            {tourState === tourStates.JUST_FINISH && (
+              <div>
+                <h3 className="ta-c">
+                  Estamos calculando los resultados del torneo
+                </h3>
+                <h4 className="ta-c text-color-primary">¡Danos un minuto!</h4>
+                <br></br>
+                <br></br>
+                <br></br>
+                <br></br>
+                <br></br>
+                <br></br>
               </div>
             )}
             {/* <SectionHeader data={sectionHeader} className="center-content back-foto" /> */}
@@ -543,16 +620,26 @@ export default function Tournaments({
                       {tournament.mapa}
                       <span className="text-color-low"> | </span>
                       {tournament.modo}
-                      <span className="text-color-low"> | </span> k/d max:{" "}
-                      {tournament.kdmax}
+                      <span className="text-color-low"> | </span> Duración:{" "}
+                      {tournament.duration} horas
                     </h3>
                   )}
-                  <p className="m-0">
-                    Estas partidas, ganarán 1 punto por eliminación; con 20
-                    puntos por una victoria, 15 por los 5 primeros, 10 por los
-                    15 primero y 5 por los 25 primeros. El ganador será el
-                    equipo con más puntos después de las 3 partidas privadas
-                  </p>
+                  <div className="tour-description">
+                    <p className="tittle">Sitema de puntuación:</p>
+                    <ul>
+                      <li></li>
+                      <li>{svgItem}1 punto por kill.</li>
+                      <li>{svgItem}30 ptos por una victoria.</li>
+                      <li>{svgItem}20 ptos por ser segundos.</li>
+                      <li>{svgItem}15 ptos por los 5 primeros.</li>
+                      <li>{svgItem}10 ptos por los 10 primeros.</li>
+                      <li>{svgItem}5 ptos por los 20 primeros.</li>
+                    </ul>
+                    <p className="text-color-high mb-0">
+                      El ganador será el equipo con más puntos sumando sus 3
+                      mejores partidas.
+                    </p>
+                  </div>
                 </div>
                 <div
                   className={classNames(
@@ -564,70 +651,6 @@ export default function Tournaments({
                   <Image
                     src="/images/zeus-s1.jpg"
                     alt="Features split 01"
-                    width={528}
-                    height={396}
-                  />
-                </div>
-              </div>
-
-              <div className="split-item">
-                <div
-                  className="split-item-content center-content-mobile reveal-from-right"
-                  data-reveal-container=".split-item"
-                >
-                  <div className="text-xxs text-color-primary fw-600 tt-u mb-8">
-                    Lightning fast workflow
-                  </div>
-                  <h3 className="mt-0 mb-12">Data-driven insights</h3>
-                  <p className="m-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua — Ut enim ad minim veniam, quis nostrud exercitation
-                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                  </p>
-                </div>
-                <div
-                  className={classNames(
-                    "split-item-image center-content-mobile reveal-from-bottom",
-                    imageFill && "split-item-image-fill"
-                  )}
-                  data-reveal-container=".split-item"
-                >
-                  <Image
-                    // src={require("./../../assets/images/features-split-image-02.png")}
-                    alt="Features split 02"
-                    width={528}
-                    height={396}
-                  />
-                </div>
-              </div>
-
-              <div className="split-item">
-                <div
-                  className="split-item-content center-content-mobile reveal-from-left"
-                  data-reveal-container=".split-item"
-                >
-                  <div className="text-xxs text-color-primary fw-600 tt-u mb-8">
-                    Lightning fast workflow
-                  </div>
-                  <h3 className="mt-0 mb-12">Data-driven insights</h3>
-                  <p className="m-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua — Ut enim ad minim veniam, quis nostrud exercitation
-                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                  </p>
-                </div>
-                <div
-                  className={classNames(
-                    "split-item-image center-content-mobile reveal-from-bottom",
-                    imageFill && "split-item-image-fill"
-                  )}
-                  data-reveal-container=".split-item"
-                >
-                  <Image
-                    // src={require("./../../assets/images/features-split-image-03.png")}
-                    alt="Features split 03"
                     width={528}
                     height={396}
                   />

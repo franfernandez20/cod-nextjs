@@ -1,5 +1,30 @@
 import firebase from "firebase";
 
+import * as codTournamentService from "../services/codtournamentService";
+
+const WEEK_TIME = (1000 * 60 * 60 * 24 * 7)
+
+/**
+ * Funcion aux para recuperar las stats de nuevo y setearse al user en el context
+ * @param {*} user 
+ * @param {*} onChange 
+ */
+const updateUserStats = (user) => {
+  return codTournamentService
+    .getUserStats(user.gameid, user.cod.platform)
+    .then((stats) => {
+      if (stats.status === "success") {
+        const { kdRatio, deaths, kills, wins } = stats.wz.br_all.properties;
+        const newCod = {...user.cod, kdRatio, deaths, kills, wins }
+        console.log('newCod', newCod)
+        updateDBUserStats(user.id, newCod);
+        const newUser = { ...user, cod: newCod }
+        console.log('newUser', newUser)
+        return newUser
+      } else return user
+    });
+};
+
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyBvnXT8lIDhKc1JUwbMXqsw6ZLbQHfda1A",
@@ -28,12 +53,22 @@ const mapUserFromFirebaseAuthToUser = (user) => {
 
 export const onAuthStateChanged = (onChange) => {
   return firebase.auth().onAuthStateChanged((user) => {
+    // console.log('-------CAMBIA', user)
     if (user) {
       const normalizedUser = user ? mapUserFromFirebaseAuthToUser(user) : null;
       // Comprobar con usuario en db
       getDBUser(normalizedUser.uid).then((user) => {
-        if (user) onChange(user);
-        else {
+        if (user) {
+          if (user.cod &&
+            (!user.lastUpdate ||
+            user.lastUpdate < (new Date().getTime() - WEEK_TIME))
+          ) {
+            updateUserStats(user).then(onChange);
+            // onChange(user);
+          } else {
+            onChange(user);
+          }
+        } else {
           createDBUser(normalizedUser);
           onChange(normalizedUser);
         }
@@ -119,7 +154,24 @@ export const updateDBUser = (
     {
       gameid: gameid,
       secondaryGameId,
+      lastUpdate: firebase.firestore.Timestamp.fromDate(new Date()),
       unoId,
+      cod: cod,
+    },
+    { merge: true }
+  );
+};
+
+/**
+ * Actualizar solo user.cod
+ * @param {*} uid 
+ * @param {*} cod 
+ */
+export const updateDBUserStats = (uid, cod) => {
+  var userRef = dbService.collection("users").doc(uid);
+  return userRef.set(
+    {
+      lastUpdate: firebase.firestore.Timestamp.fromDate(new Date()),
       cod: cod,
     },
     { merge: true }
@@ -136,12 +188,13 @@ export const getDBUser = (uid) => {
         // console.log("Document data:", doc.data());
         const data = doc.data();
         const id = doc.id;
-        const { createdAt } = data;
+        const { createdAt, lastUpdate } = data;
 
         return {
           ...data,
           id,
           createdAt: +createdAt.toDate(),
+          lastUpdate: lastUpdate ? +lastUpdate.toDate() : undefined,
         };
       } else {
         // doc.data() will be undefined in this case
@@ -426,6 +479,7 @@ export const getUserTeam = (teamid, userid) => {
   /**
    * Busca un team con ese nombre
    * solo busca equipos con ese tourid
+   * Cuidado cambios en teams impricar cambior aqui
    * TODO paralelizar las segundas peticiones
    */
   export const getTeamByName = (lookTeamName, tourid) => {
@@ -438,9 +492,8 @@ export const getUserTeam = (teamid, userid) => {
         let teams = [];
         query.forEach((doc) => {
           // doc.data() is never undefined for query doc snapshots
-          console.log(doc.id, " => ", doc.data());
-          const { teamName, tourid, users } = doc.data();
-          teams = [{ teamid: doc.id, teamName, tourid, users }, ...teams];
+          const { teamName, tourid, teamKD, users } = doc.data();
+          teams = [{ teamid: doc.id, teamName, tourid, teamKD, users }, ...teams];
         });
         return teams;
       })
@@ -464,9 +517,8 @@ export const getUserTeam = (teamid, userid) => {
         let teams = [];
         query.forEach((doc) => {
           // doc.data() is never undefined for query doc snapshots
-          console.log(doc.id, " => ", doc.data());
-          const { teamName, tourid, users } = doc.data();
-          teams = [{ teamid: doc.id, teamName, tourid, users }, ...teams];
+          const { teamName, tourid, teamKD, users } = doc.data();
+          teams = [{ teamid: doc.id, teamName, tourid, teamKD, users }, ...teams];
         });
         return teams;
       })
@@ -548,14 +600,3 @@ export const getUserTeam = (teamid, userid) => {
         })
     );
   };
-
-
-  // br_brtrios
-  // br_brduos
-
-  // brtdm_wzrumval2
-
-
-  // slori3577
-  // lukydog83
-  // MAREMMAMAIALA
