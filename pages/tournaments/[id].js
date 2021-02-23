@@ -443,7 +443,7 @@ export default function Tournaments({
           tourid={tournament.id}
           tourModo={tournament.modo}
           tourMaxKD={tournament.kdmax}
-          userKD={user.cod.kdRatio}
+          userKD={user.cod && user.cod.kdRatio}
           onTeamSelected={handleTeamSelected}
         />
       );
@@ -581,7 +581,7 @@ export default function Tournaments({
                   show={inscripcionModalActive}
                   handleClose={closeInscripcionModal}
                 >
-                  {switchModalContent()}
+                  {user && switchModalContent()}
                 </Modal>
               </div>
             )}
