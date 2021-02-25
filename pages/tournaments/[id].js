@@ -246,7 +246,7 @@ const Step1 = ({ onConfirm, onCancel }) => {
         Por el momento los métodos de pago son mediante Bizum al número de
         teléfono indicado con tu GameId como asunto.
       </p>
-      <h4 className="mb-8">690 000 000</h4>
+      <h4 className="mb-8">660 73 30 25</h4>
       <p className="mb-8">Mediante PayPal en el siguiente enlace</p>
       <a
         className="text-color-low tt-underline"
