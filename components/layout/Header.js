@@ -232,7 +232,7 @@ const Header = ({
                         <Link href="/reglamento" classNames="text-xs" >Reglamento</Link>
                       </div>
                       <div className="header-link">
-                        <Link href="#0" classNames="text-xs" >Sobre nosotros</Link>
+                        <Link href="/" classNames="text-xs" >Sobre nosotros</Link>
                       </div>
                     </div>
                   {!user || !user.username ? (

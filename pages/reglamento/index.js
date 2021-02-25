@@ -2,6 +2,7 @@ import classNames from "classnames";
 import { SectionSplitProps } from "../../utils/SectionProps";
 import Link from "next/link";
 import SectionHeader from "../../components/sections/partials/SectionHeader";
+import Testimonial from "../../components/sections/Testimonial";
 import Image from "../../components/elements/Image";
 
 // import dd from ""
@@ -58,7 +59,7 @@ export default function Reglamento({
     <section {...props} className={outerClasses}>
       <div className="container">
         <div className={innerClasses}>
-          <SectionHeader data={sectionHeader} className="center-content" />
+          <Testimonial />
           <div className={splitClasses}>
             <div className="split-item">
               <div
