@@ -129,6 +129,39 @@ export default function Reglamento({
                 />
               </div>
             </div>
+
+            <div className="split-item">
+              <div
+                className="split-item-content center-content-mobile reveal-from-left"
+                data-reveal-container=".split-item"
+              >
+                <div className="text-xxs text-color-primary fw-600 tt-u mb-8">
+                  _________________________________________
+                </div>
+                <h3 className="mt-0 mb-12">Métodos de pago</h3>
+                <p className="m-0">
+                  Los métodos de pago disponibles serán Bizum y PayPal. Por el
+                  momento nos hemos decantado por ellos debido a que no tienen
+                  comisiones. La intención desde COD_JF es maximizar los premios
+                  y trataremos que ha ellos llegue el mayor porcentaje posible.
+                </p>
+              </div>
+              <div
+                className={classNames(
+                  "split-item-image center-content-mobile reveal-from-bottom",
+                  imageFill && "split-item-image-fill"
+                )}
+                data-reveal-container=".split-item"
+              >
+                <Image
+                  //   src={require(".//images/controller1-03.png")}
+                  src="/images/zeus-s1.jpg"
+                  alt="Features split 03"
+                  width={528}
+                  height={396}
+                />
+              </div>
+            </div>
           </div>
           {/* -------------------------- */}
 

@@ -243,13 +243,17 @@ const Step1 = ({ onConfirm, onCancel }) => {
   return (
     <div>
       <p>
-        Por el momento los métodos de pago son mediante Bizum al número de
-        teléfono indicado con tu GameId como asunto.
+        Se debe realizar el pago del equipo al completo. Haciendo un Bizum con
+        el nombre de Equipo como asunto. Teléfonos:
       </p>
-      <h4 className="mb-8">660 73 30 25</h4>
-      <p className="mb-8">Mediante PayPal en el siguiente enlace</p>
+      <h5 className="mb-8 mt-4">660 73 30 25</h5>
+      <h5 className="mb-8 mt-4">690 13 87 77</h5>
+      <p className="mb-8">
+        Mediante PayPal con el nombre de Equipo como comentario en el siguiente
+        enlace
+      </p>
       <a
-        className="text-color-low tt-underline"
+        className="text-color-mid tt-underline"
         href="https://paypal.me/codJF?locale.x=es_ES"
         target="_blank"
         rel="noopener noreferrer"
@@ -257,13 +261,15 @@ const Step1 = ({ onConfirm, onCancel }) => {
         PayPal COD_JF
       </a>
       <p className="mt-16">
-        Una vez validado el pago apareceras inscrito en el torneo. Y tendrás
-        acceso con tu GameId
+        Una vez validado el pago tu equipo aparecerá inscrito en el torneo. Y tendreís
+        acceso con vuestro GameId
       </p>
-      <p className="text-color-low tt-underline">
-        <span className="text-color-primary">*</span> Por qué de estos metodos
-        de pago
-      </p>
+      <Link href="/reglamento" classNames="text-xs">
+        <p className="text-color-low tt-underline">
+          <span className="text-color-primary">*</span> Por qué de estos metodos
+          de pago
+        </p>
+      </Link>
       <ButtonGroup className="mt-8">
         <Button
           tag="a"
@@ -347,7 +353,7 @@ export default function Tournaments({
 
   const checkUserPay = () => {
     const userTournament =
-      user && user.tournaments.find((e) => e.tid === tournament.id);
+      user && user.tournaments && user.tournaments.find((e) => e.tid === tournament.id);
     if (userTournament && userTournament.payed) setUserPay(true);
   };
 
@@ -417,6 +423,7 @@ export default function Tournaments({
     if (userTeam.teamid) {
       const newTeam = userTeam;
       newTeam.users = newTeam.users.filter((elem) => elem.user !== user.id);
+      newTeam.teamKD = userTeam.teamKD - user.cod.kdRatio
       inscribeTeam(newTeam);
       setUserTeam({});
     }

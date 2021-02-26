@@ -1,4 +1,3 @@
-import { set } from "lodash";
 import { useState, useEffect, useContext } from "react";
 import { onAuthStateChanged } from "../firebase/client";
 
@@ -16,9 +15,9 @@ export default function useUser() {
     dispatch({ type: "setUser", value: user });
   } 
 
-  useEffect(() => {
-    onAuthStateChanged(setUser);
-  }, []);
+  // useEffect(() => {
+    // onAuthStateChanged(setUser);
+  // }, []);
 
   const logOut = () => setUser(undefined);
   // const updateUser = (newuser) => {

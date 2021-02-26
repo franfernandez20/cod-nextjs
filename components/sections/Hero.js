@@ -97,6 +97,25 @@ const Hero = ({
               };
               setLogged(newlogged);
               setResgistroResults([]);
+            })
+            .catch((e) => {
+              // Mejorar esto que lo estas haciendo 2 veces 
+              const mapAvatar =
+                avatar && avatar.avatarUrlLargeSsl
+                  ? avatar.avatarUrlLargeSsl
+                  : avatar;
+              const newlogged = {
+                ...codUser,
+                kdRatio,
+                deaths,
+                kills,
+                wins,
+                avatar: mapAvatar,
+                secondaryGameId: '',
+                unoId: '',
+              };
+              setLogged(newlogged);
+              setResgistroResults([]);
             });
         } else {
           if (stats.message === "Not permitted: not allowed")
@@ -165,7 +184,7 @@ const Hero = ({
       unoId,
       cod,
     };
-    updateDBUser(user.id, username, secondaryGameId, unoId, cod);
+    updateDBUser(user.uid, username, secondaryGameId, unoId, cod);
     updateUser(newuser);
     closeRegistroModal();
   };

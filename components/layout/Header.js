@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import classNames from "classnames";
 import { useRouter } from "next/router";
 import useUser from "../../hooks/useUser";
+import loggedUseUser from "../../hooks/loggedUseUser";
 import Logo from "./partials/Logo";
 
 import Avatar from "../elements/Avatar";
@@ -53,6 +54,7 @@ const Header = ({
   const [isActive, setIsactive] = useState(false);
 
   const [user, logOut, updateUser] = useUser();
+  const [loggedUser] = loggedUseUser();
 
   const globalState = useContext(store);
   const router = useRouter();
@@ -74,8 +76,8 @@ const Header = ({
   });
 
   useEffect(() => {
-    if (user) hideSignin = true;
-  }, [user]);
+    if (loggedUser) hideSignin = true;
+  }, [loggedUser]);
 
   const openMenu = () => {
     document.body.classList.add("off-nav-is-active");
