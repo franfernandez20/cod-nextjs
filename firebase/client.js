@@ -36,6 +36,16 @@ const firebaseConfig = {
   measurementId: "G-N4YHY5PZZE",
 };
 
+const firebaseConfig2 = {
+  apiKey: "AIzaSyCLCWVvqXPa7w4aG7oRO7cuZw4L_aD-rDg",
+  authDomain: "codjf-tournaments.firebaseapp.com",
+  projectId: "codjf-tournaments",
+  storageBucket: "codjf-tournaments.appspot.com",
+  messagingSenderId: "826598295492",
+  appId: "1:826598295492:web:46dbf3c99cc5615cc80691",
+  measurementId: "G-NN4J2HEM6L"
+};
+
 !firebase.apps.length && firebase.initializeApp(firebaseConfig);
 
 const dbService = firebase.firestore();
@@ -58,6 +68,7 @@ export const onAuthStateChanged = (onChange) => {
       const normalizedUser = user ? mapUserFromFirebaseAuthToUser(user) : null;
       // Comprobar con usuario en db
       getDBUser(normalizedUser.uid).then((user) => {
+        console.log("Whatsss")
         if (user) {
           if (user.cod &&
             (!user.lastUpdate ||
@@ -376,7 +387,7 @@ export const inscribeUserToTournament = (uid, tournament) => {
 
 export const deleteUserToTournament = (uid, tournament) => {
   const { id: tid, topay } = tournament;
-  if (!topay.includes(uid)) return
+  // if (!topay.includes(uid)) return // Tratar eso el tour viene de props server aun no actualizado
   var tournamentRef = dbService.collection("tournament").doc(tid);
 
   return tournamentRef
@@ -479,7 +490,7 @@ export const getUserTeam = (teamid, userid) => {
   /**
    * Busca un team con ese nombre
    * solo busca equipos con ese tourid
-   * Cuidado cambios en teams impricar cambior aqui
+   * Cuidado cambios en teams impricar cambios aqui
    * TODO paralelizar las segundas peticiones
    */
   export const getTeamByName = (lookTeamName, tourid) => {
@@ -517,8 +528,7 @@ export const getUserTeam = (teamid, userid) => {
         let teams = [];
         query.forEach((doc) => {
           // doc.data() is never undefined for query doc snapshots
-          const { teamName, tourid, teamKD, users } = doc.data();
-          teams = [{ teamid: doc.id, teamName, tourid, teamKD, users }, ...teams];
+          teams = [{ ...doc.data() }, ...teams];
         });
         return teams;
       })
@@ -545,6 +555,49 @@ export const getUserTeam = (teamid, userid) => {
           console.error("Error adding document: ", error);
         });
   };
+
+  /**
+   * 
+   * @param {*} teamid -->  
+   * @param {*} payed  --> true para marcar como pagado | false no pagado
+   */
+  export const setTeamPayed = (teamid, payed) => {
+    var userRef = dbService.collection("teams").doc(teamid);
+    return userRef.set(
+      {
+        payed
+      },
+      { merge: true }
+    );
+  };
+  
+  export const setUserPayed = (userid, tid, payed) => {
+    var userRef = dbService.collection("users").doc(userid);
+    return userRef
+      .update({
+        tournaments: firebase.firestore.FieldValue.arrayRemove({
+          tid,
+          payed: !payed,
+        }),
+      })
+      .then(() => {
+        var userRefSet = dbService.collection("users").doc(userid);
+        userRefSet.set(
+          {
+            tournaments: firebase.firestore.FieldValue.arrayUnion({
+              tid,
+              payed: payed,
+            }),
+          },
+          { merge: true }
+        );
+      })
+      .catch((e) => {
+        console.log("Error guardando el torneo en el user", e);
+      });
+  };
+
+  
   
   /**
    * Get all teams of a tour

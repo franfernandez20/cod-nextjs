@@ -5,7 +5,7 @@ import { store } from "../../hooks/store";
 import styles from "./card.module.css";
 import classNames from "classnames";
 
-import LevelComponent from "../elements/LevelComponent"
+import LevelComponent from "../elements/LevelComponent";
 
 import CheckOk from "./icons/checkOk";
 import CheckCroos from "./icons/checkCross";
@@ -29,9 +29,6 @@ const getRango = (level, modo) => {
       break;
   }
 };
-
-
-
 
 const IsPayComponent = ({ inscribed }) => {
   return (
@@ -88,6 +85,7 @@ export default function Card({ tournament }) {
     payed,
     topay,
     visible,
+    extraPlayers,
   } = tournament;
   const total = payed.length + topay.length;
   const { user } = state;
@@ -134,7 +132,9 @@ export default function Card({ tournament }) {
                       </div>
                     </div>
                     <div className="match-details-listing__map">
-                      <span className="text-color-low mt-8">Duración: {duration} horas</span>
+                      <span className="text-color-low mt-8">
+                        Duración: {duration} horas
+                      </span>
                     </div>
                     {inscribedPayed[0] && (
                       <div className="match-details-listing__timestamp">
@@ -150,10 +150,14 @@ export default function Card({ tournament }) {
                       BR - {modo}
                     </div>
                     <div className="match-details-listing__placement warzone loss">
-                      <span className="text-color-success">{total}</span>
+                      <span className="text-color-success">
+                        {typeof extraPlayers !== "undefined"
+                          ? total + extraPlayers
+                          : total}
+                      </span>
                       <span className="text-color-low">/150</span>
                     </div>
-                    {highlight && <HighlightReward minReward={minReward}/>}
+                    {highlight && <HighlightReward minReward={minReward} />}
                   </div>
                 </li>
               </ul>

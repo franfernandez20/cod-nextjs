@@ -28,15 +28,13 @@ const StateProvider = ({ children }) => {
         newState = { ...state, tournament };
         return newState;
       case "tournament-deleteUser":
-        const { topay, id } = state.tournament;
+        // debugger;
+        const { topay } = state.tournament;
         const idx = topay.indexOf(action.value);
         if (idx > -1) {
           const newTopay = topay.splice(idx, 1);
-          const tournament = { ...tournament, topay: newTopay };
-          const user = state.user;
-          const tournaments = user.tournaments.filter(e => e.tid !== id)
-          const newuser = {...user, tournaments}
-          newState = { ...state, tournament, user: newuser };
+          const tournament = { ...state.tournament, topay: newTopay };
+          newState = { ...state, tournament };
           return newState;
         } else return state;
       case "init":

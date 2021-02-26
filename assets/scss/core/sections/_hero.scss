@@ -166,6 +166,21 @@
 		margin-right: 6px;
 	}
 
+	.team-no-pay {
+		border: 1px solid #08080843;
+		border-radius: 20px;
+	}
+
+	.team-pay {
+		border: 10px solid #00fc48;
+    	border-radius: 29px;
+	}
+
+	.metodo-pago{
+		border: 3px solid #3a3b3aa4;
+    	border-radius: 20px;
+	}
+
 	@include media( '<medium' ) {
 		.tour-description {
 			text-align: left;

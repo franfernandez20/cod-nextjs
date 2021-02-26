@@ -261,8 +261,8 @@ const Step1 = ({ onConfirm, onCancel }) => {
         PayPal COD_JF
       </a>
       <p className="mt-16">
-        Una vez validado el pago tu equipo aparecerá inscrito en el torneo. Y tendreís
-        acceso con vuestro GameId
+        Una vez validado el pago tu equipo aparecerá inscrito en el torneo. Y
+        tendreís acceso con vuestro GameId
       </p>
       <Link href="/reglamento" classNames="text-xs">
         <p className="text-color-low tt-underline">
@@ -353,7 +353,9 @@ export default function Tournaments({
 
   const checkUserPay = () => {
     const userTournament =
-      user && user.tournaments && user.tournaments.find((e) => e.tid === tournament.id);
+      user &&
+      user.tournaments &&
+      user.tournaments.find((e) => e.tid === tournament.id);
     if (userTournament && userTournament.payed) setUserPay(true);
   };
 
@@ -408,6 +410,12 @@ export default function Tournaments({
     inscribeUserToTournament(user.id, tournament)
       .then(() => {
         inscribeTeam(userTeam).catch((e) => console.log("error$$$", e));
+        const tours = [
+          ...user.tournaments,
+          { tid: tournament.id, payed: false },
+        ];
+        const newuser = { ...user, tournaments: tours };
+        updateUser(newuser);
         setInscripcionDone(true);
       })
       .catch((e) => console.log("error", e));
@@ -420,10 +428,14 @@ export default function Tournaments({
   const handleDelete = (e) => {
     e.preventDefault();
     deleteUserToTournament(user.id, tournament);
+    const tours = user.tournaments.filter((tour) => tour.tid !== tournament.id);
+    const newuser = { ...user, tournaments: tours };
+    updateUser(newuser);
+
     if (userTeam.teamid) {
       const newTeam = userTeam;
       newTeam.users = newTeam.users.filter((elem) => elem.user !== user.id);
-      newTeam.teamKD = userTeam.teamKD - user.cod.kdRatio
+      newTeam.teamKD = userTeam.teamKD - user.cod.kdRatio;
       inscribeTeam(newTeam);
       setUserTeam({});
     }
@@ -531,36 +543,70 @@ export default function Tournaments({
                   {inscripcionDone ? (
                     <>
                       {userTeam && userTeam.users && (
-                        <ul className="has-bg-color mt-16">
+                        <ul
+                          className={classNames(
+                            "has-bg-color mt-16 team-no-pay",
+                            userTeam.payed && "team-pay"
+                          )}
+                        >
                           <h4 className="text-color-primary has-bottom-divider mb-0">
                             {userTeam.teamName}
                           </h4>
                           {userTeam.users.map((user) => (
                             <p
                               key={user.gameid}
-                              className="text-color-low mt-0 mb-0"
+                              className="text-color-low mt-0 mb-0 tl-s-8"
                             >
                               {user.gameid}
                             </p>
                           ))}
                         </ul>
                       )}
-
-                      <div className="borrarme-section">
-                        <p className="text-xs mr-16">
-                          Ya estas apuntado a este torneo
-                        </p>
-                        <Button
-                          className=""
-                          size="xxs"
-                          color="error"
-                          disabled={userPay}
-                          onClick={handleDelete}
-                        >
-                          Borrarme
-                        </Button>
-                      </div>
-                      <h4 className="mt-8">
+                      {userTeam && userTeam.payed ? (
+                        <>
+                          <p className="mb-0">Recibimos el pago </p>
+                          <h4 className="mt-0">
+                            ¡Ya estaís inscritos al torneo 😁!
+                          </h4>
+                        </>
+                      ) : (
+                        <>
+                          <div className="borrarme-section">
+                            <p className="text-xs mr-16">
+                              Ya estas apuntado a este torneo 😀
+                            </p>
+                            <Button
+                              className=""
+                              size="xxs"
+                              color="error"
+                              disabled={userPay}
+                              onClick={handleDelete}
+                            >
+                              Borrarme
+                            </Button>
+                          </div>
+                          <div className="metodo-pago">
+                            <p className="text-sm mb-0 text-color-mid">
+                              Solo os queda realizar el Pago
+                            </p>
+                            <p className="text-sm mt-0 mb-0 text-color-mid ta-l ml-32">
+                              ➡ BIZUM <span className="text-xxs text-color-high">660 73 30 25 | 690 13 87 77</span>
+                            </p>
+                            <p className="text-sm mt-0 mb-0 text-color-mid ta-l ml-32">
+                              ➡ PayPal:
+                              <a
+                                className="text-color-mid tt-underline ml-8"
+                                href="https://paypal.me/codJF?locale.x=es_ES"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                PayPal COD_JF
+                              </a>
+                            </p>
+                          </div>
+                        </>
+                      )}
+                      <h4 className="mt-8 text-color-low">
                         Pago confirmado:
                         {userPay ? (
                           <CheckOk color="#24E5AF" />

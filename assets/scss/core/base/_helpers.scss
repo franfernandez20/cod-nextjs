@@ -110,14 +110,37 @@
 }
 
 .tt-underline {
-	text-decoration: underline;
-	
+	text-decoration: underline;	
 }
 
 .tt-underline:hover {
 	cursor: pointer;
 }
 
+.tl-s-8 {
+	letter-spacing: 8px;	
+	text-overflow: ellipsis;	
+	white-space: nowrap;
+	overflow: hidden;	
+}
+.tl-s-12 {
+	letter-spacing: 12px;	
+	text-overflow: ellipsis;
+	white-space: nowrap;
+  	overflow: hidden;	
+}
+.tl-s-16 {
+	letter-spacing: 16px;	
+	text-overflow: ellipsis;
+	white-space: nowrap;
+  	overflow: hidden;	
+}
+.tl-s-24 {
+	letter-spacing: 24px;
+	text-overflow: ellipsis;	
+	white-space: nowrap;
+	overflow: hidden;	
+}
 // Images
 .image-full {
 	width: 100%;
