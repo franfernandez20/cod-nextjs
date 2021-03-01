@@ -92,8 +92,8 @@ const Hero = ({
                 kills,
                 wins,
                 avatar: mapAvatar,
-                secondaryGameId: userNames.username,
-                unoId: userNames.uno,
+                secondaryGameId: userNames.username || '',
+                unoId: userNames.uno || '',
               };
               setLogged(newlogged);
               setResgistroResults([]);
