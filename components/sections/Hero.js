@@ -77,48 +77,59 @@ const Hero = ({
       .getUserStats(username, platform)
       .then((stats) => {
         if (stats.status === "success") {
-          const { kdRatio, deaths, kills, wins } = stats.wz.br_all.properties;
-          codTournamentService
-            .getUserMatchNames(registroValue, platform)
-            .then((userNames) => {
-              const mapAvatar =
-                avatar && avatar.avatarUrlLargeSsl
-                  ? avatar.avatarUrlLargeSsl
-                  : avatar;
-              const newlogged = {
-                ...codUser,
-                kdRatio,
-                deaths,
-                kills,
-                wins,
-                avatar: mapAvatar,
-                secondaryGameId: userNames.username || "",
-                unoId: userNames.uno || "",
-              };
-              setLogged(newlogged);
-              setResgistroResults([]);
-              setLoading(false);
-            })
-            .catch((e) => {
-              // Mejorar esto que lo estas haciendo 2 veces
-              const mapAvatar =
-                avatar && avatar.avatarUrlLargeSsl
-                  ? avatar.avatarUrlLargeSsl
-                  : avatar;
-              const newlogged = {
-                ...codUser,
-                kdRatio,
-                deaths,
-                kills,
-                wins,
-                avatar: mapAvatar,
-                secondaryGameId: "",
-                unoId: "",
-              };
-              setLogged(newlogged);
-              setResgistroResults([]);
-              setLoading(false);
-            });
+          const {
+            kdRatio,
+            deaths,
+            kills,
+            wins,
+            gamesPlayed,
+          } = stats.wz.br_all.properties;
+          if (gamesPlayed > 150) {
+            codTournamentService
+              .getUserMatchNames(registroValue, platform)
+              .then((userNames) => {
+                const mapAvatar =
+                  avatar && avatar.avatarUrlLargeSsl
+                    ? avatar.avatarUrlLargeSsl
+                    : avatar;
+                const newlogged = {
+                  ...codUser,
+                  kdRatio,
+                  deaths,
+                  kills,
+                  wins,
+                  avatar: mapAvatar,
+                  secondaryGameId: userNames.username || "",
+                  unoId: userNames.uno || "",
+                };
+                setLogged(newlogged);
+                setResgistroResults([]);
+                setLoading(false);
+              })
+              .catch((e) => {
+                // Mejorar esto que lo estas haciendo 2 veces
+                const mapAvatar =
+                  avatar && avatar.avatarUrlLargeSsl
+                    ? avatar.avatarUrlLargeSsl
+                    : avatar;
+                const newlogged = {
+                  ...codUser,
+                  kdRatio,
+                  deaths,
+                  kills,
+                  wins,
+                  avatar: mapAvatar,
+                  secondaryGameId: "",
+                  unoId: "",
+                };
+                setLogged(newlogged);
+                setResgistroResults([]);
+                setLoading(false);
+              });
+          } else {
+            setRegistroError("Debes tener más partidas jugadas para poder registrar un usuario");
+            setLoading(false);
+          }
         } else {
           if (stats.message === "Not permitted: not allowed")
             setRegistroError("Este usuario es privado");
@@ -266,7 +277,7 @@ const Hero = ({
           <Modal show={registroModalActive} handleClose={closeRegistroModal}>
             {loading ? (
               <div className="loader-content">
-                <div className='loader'></div>
+                <div className="loader"></div>
               </div>
             ) : (
               <>
