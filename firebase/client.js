@@ -147,6 +147,7 @@ export const unregisterUser = (uid, gameid) => {
       cod: null,
       gameid: null,
       previousGameid: gameid,
+      secondaryGameid: null,
     },
     { merge: true }
   );

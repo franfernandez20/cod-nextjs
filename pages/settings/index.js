@@ -11,7 +11,9 @@ export default function Settings() {
     const newuser = { ...user };
     newuser.cod = null;
     newuser.gameid = null;
+    newuser.secondaryGameId = null;
     unregisterUser(user.uid, user.gameid);
+    // TODO - Crear todos estos metodos en useUser| unregistreGameUser(uid)
     updateUser(newuser);
   };
 
@@ -31,7 +33,11 @@ export default function Settings() {
                 <Button
                   className="magin-bottom-8-mobile"
                   color="primary"
-                  title={user.tournaments.length > 0 ? "Debes borrarte de tus torneos" : "Borrar usuario"}
+                  title={
+                    user.tournaments.length > 0
+                      ? "Debes borrarte de tus torneos"
+                      : "Borrar usuario"
+                  }
                   size="sm"
                   onClick={handleLogOut}
                   disabled={user.tournaments.length > 0}

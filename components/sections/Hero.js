@@ -92,14 +92,15 @@ const Hero = ({
                 kills,
                 wins,
                 avatar: mapAvatar,
-                secondaryGameId: userNames.username || '',
-                unoId: userNames.uno || '',
+                secondaryGameId: userNames.username || "",
+                unoId: userNames.uno || "",
               };
               setLogged(newlogged);
               setResgistroResults([]);
+              setLoading(false);
             })
             .catch((e) => {
-              // Mejorar esto que lo estas haciendo 2 veces 
+              // Mejorar esto que lo estas haciendo 2 veces
               const mapAvatar =
                 avatar && avatar.avatarUrlLargeSsl
                   ? avatar.avatarUrlLargeSsl
@@ -111,18 +112,19 @@ const Hero = ({
                 kills,
                 wins,
                 avatar: mapAvatar,
-                secondaryGameId: '',
-                unoId: '',
+                secondaryGameId: "",
+                unoId: "",
               };
               setLogged(newlogged);
               setResgistroResults([]);
+              setLoading(false);
             });
         } else {
           if (stats.message === "Not permitted: not allowed")
             setRegistroError("Este usuario es privado");
           else setRegistroError("No se encontró el usuario");
+          setLoading(false);
         }
-        setLoading(false);
       })
       .catch((e) => console.log(e));
   };
@@ -263,7 +265,9 @@ const Hero = ({
           </div>
           <Modal show={registroModalActive} handleClose={closeRegistroModal}>
             {loading ? (
-              <img src="/spinner2.gif" />
+              <div className="loader-content">
+                <div className='loader'></div>
+              </div>
             ) : (
               <>
                 {!logged ? (
