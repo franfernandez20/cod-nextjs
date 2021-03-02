@@ -20,16 +20,6 @@ const diaSemana = [
   "SABADO",
 ];
 
-const getRango = (level, modo) => {
-  switch (true) {
-    case value:
-      break;
-
-    default:
-      break;
-  }
-};
-
 const IsPayComponent = ({ inscribed }) => {
   return (
     <div
@@ -105,6 +95,19 @@ export default function Card({ tournament }) {
     });
   };
 
+  const getModo = (modo) => {
+    switch (modo) {
+      case "br_brduos":
+        return "DUOS";
+      case "br_brtrios":
+        return "TRIOS";
+      case "br_brquads":
+        return "CUARTETOS";
+      default:
+        return modo;
+    }
+  };
+
   return (
     <>
       {tournament && visible && (
@@ -147,7 +150,7 @@ export default function Card({ tournament }) {
                       <span className="text-color-mid">{mapa}</span>
                     </div>
                     <div className="match-details-listing__mode">
-                      BR - {modo}
+                      BR - {getModo(modo)}
                     </div>
                     <div className="match-details-listing__placement warzone loss">
                       <span className="text-color-success">
