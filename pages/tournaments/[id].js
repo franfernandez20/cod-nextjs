@@ -409,7 +409,15 @@ export default function Tournaments({
     e.preventDefault();
     inscribeUserToTournament(user.id, tournament)
       .then(() => {
-        inscribeTeam(userTeam).catch((e) => console.log("error$$$", e));
+        inscribeTeam(userTeam)
+          .then(({ id }) => {
+            if (id) {
+              const newUserTeam = userTeam;
+              newUserTeam.teamid = id;
+              setUserTeam(newUserTeam);
+            }
+          })
+          .catch((e) => console.log("error$$$", e));
         const tours = [
           ...user.tournaments,
           { tid: tournament.id, payed: false },
@@ -590,7 +598,10 @@ export default function Tournaments({
                               Solo os queda realizar el Pago
                             </p>
                             <p className="text-sm mt-0 mb-0 text-color-mid ta-l ml-32">
-                              ➡ BIZUM <span className="text-xxs text-color-high">660 73 30 25 | 690 13 87 77</span>
+                              ➡ BIZUM
+                              <span className="text-xxs text-color-high">
+                                660 73 30 25 | 690 13 87 77
+                              </span>
                             </p>
                             <p className="text-sm mt-0 mb-0 text-color-mid ta-l ml-32">
                               ➡ PayPal:

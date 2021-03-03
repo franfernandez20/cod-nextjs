@@ -549,12 +549,28 @@ export const getUserTeam = (teamid, userid) => {
       return dbService
         .collection("teams")
         .add(team)
-        .then(function (docRef) {
-          console.log("Document written with ID: ", docRef.id);
-        })
-        .catch(function (error) {
-          console.error("Error adding document: ", error);
-        });
+        // .then(function (docRef) {
+        //   console.log("Document written with ID: ", docRef.id);
+        // })
+        // .catch(function (error) {
+        //   console.error("Error adding document: ", error);
+        // });
+  };
+
+  /**
+   * TODO
+   * @param {*} teamName 
+   */
+  export const deteleTeam = (teamName) => {
+    db.collection("teams")
+      .doc('') //teamid sacdo del teamName ?¿ 
+      .delete()
+      .then(() => {
+        console.log("Document successfully deleted!");
+      })
+      .catch((error) => {
+        console.error("Error removing document: ", error);
+      });
   };
 
   /**
