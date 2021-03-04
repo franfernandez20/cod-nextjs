@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
+import Head from "next/head";
 import Link from "next/link";
 import PropTypes from "prop-types";
 import classNames from "classnames";
@@ -152,67 +153,85 @@ const Header = ({
     router.push("/settings");
   };
 
+  const siteTitle = "Torneos – COD JF 🎮";
+
   return (
-    <header {...props} className={classes}>
-      <div className="container">
-        <div
-          className={classNames(
-            "site-header-inner",
-            bottomDivider && "has-bottom-divider"
-          )}
-        >
-          {/* <Cod_JF onClick={handleLogoClick} /> */}
-          <img className="logo-header" src="/svg-fondo-trans.png" onClick={handleLogoClick} />
-          {!hideNav && (
-            <>
+    <>
+      <Head>
+        <link rel="shortcut icon" href="/logo.svg" />
+        <meta
+          name="description"
+          content="Torneos Call Of Dutty | Warzone"
+        />
+        <title>{siteTitle}</title>
+        <meta name="og:title" content={siteTitle} />
+      </Head>
+      <header {...props} className={classes}>
+        <div className="container">
+          <div
+            className={classNames(
+              "site-header-inner",
+              bottomDivider && "has-bottom-divider"
+            )}
+          >
+            {/* <Cod_JF onClick={handleLogoClick} /> */}
+            <img
+              className="logo-header"
+              src="/svg-fondo-trans.png"
+              onClick={handleLogoClick}
+            />
+            {!hideNav && (
               <>
-                {user && user.username && (
-                  <div className="header-nav-bar" onClick={handleOnUserClick}>
-                    <Avatar
-                      alt={user.username}
-                      src={
-                        user.cod && user.cod.gameAvatar
-                          ? user.cod.gameAvatar
-                          : user.avatar
-                      }
-                    />
-                    <div className="header-nav-user">
-                      <p className="text-color-primary has-bottom-divider">
-                        {user.username}
-                      </p>
-                      <div className="header-nav-user-game">
-                        {user.cod && user.cod.platform === "psn" ? (
-                          <PsnIcon className="psn-icon" />
-                        ) : (
-                          <ActivisionIcon className="psn-icon" />
-                        )}
-                        <p className="text-color-secondary font-elect">{user.gameid}</p>
+                <>
+                  {user && user.username && (
+                    <div className="header-nav-bar" onClick={handleOnUserClick}>
+                      <Avatar
+                        alt={user.username}
+                        src={
+                          user.cod && user.cod.gameAvatar
+                            ? user.cod.gameAvatar
+                            : user.avatar
+                        }
+                      />
+                      <div className="header-nav-user">
+                        <p className="text-color-primary has-bottom-divider">
+                          {user.username}
+                        </p>
+                        <div className="header-nav-user-game">
+                          {user.cod && user.cod.platform === "psn" ? (
+                            <PsnIcon className="psn-icon" />
+                          ) : (
+                            <ActivisionIcon className="psn-icon" />
+                          )}
+                          <p className="text-color-secondary font-elect">
+                            {user.gameid}
+                          </p>
+                        </div>
                       </div>
+                      {user.cod && (
+                        <div className="header-nav-kd">
+                          <CodKD kdRatio={user.cod.kdRatio} />
+                        </div>
+                      )}
                     </div>
-                    {user.cod && (
-                      <div className="header-nav-kd">
-                        <CodKD kdRatio={user.cod.kdRatio} />
-                      </div>
-                    )}
-                  </div>
-                )}
-                <button
-                  ref={hamburger}
-                  className="header-nav-toggle"
-                  onClick={isActive ? closeMenu : openMenu}
+                  )}
+                  <button
+                    ref={hamburger}
+                    className="header-nav-toggle"
+                    onClick={isActive ? closeMenu : openMenu}
+                  >
+                    <span className="screen-reader">Menu</span>
+                    <span className="hamburger">
+                      <span className="hamburger-inner"></span>
+                    </span>
+                  </button>
+                </>
+                <nav
+                  ref={nav}
+                  className={classNames("header-nav", isActive && "is-active")}
                 >
-                  <span className="screen-reader">Menu</span>
-                  <span className="hamburger">
-                    <span className="hamburger-inner"></span>
-                  </span>
-                </button>
-              </>
-              <nav
-                ref={nav}
-                className={classNames("header-nav", isActive && "is-active")}
-              >
-                <div className="header-nav-inner">
-                  {/* <ul
+                  <div className="header-nav-inner">
+                    {/* <ul
                     className={classNames(
                       "list-reset text-xs",
                       navPosition && `header-nav-${navPosition}`
@@ -229,67 +248,72 @@ const Header = ({
                       </Link>
                     </li>
                   </ul> */}
-                  <div className="header-nav-links">
+                    <div className="header-nav-links">
                       <div className="header-link">
-                        <Link href="/reglamento" classNames="text-xs" >Reglamento</Link>
+                        <Link href="/reglamento" classNames="text-xs">
+                          Reglamento
+                        </Link>
                       </div>
                       <div className="header-link">
-                        <Link href="/" classNames="text-xs" >Sobre nosotros</Link>
+                        <Link href="/" classNames="text-xs">
+                          Sobre nosotros
+                        </Link>
                       </div>
                     </div>
-                  {!user || !user.username ? (
-                    <ul className="list-reset header-nav-right">
-                      <li>
-                        <Button
-                          className="button button-primary button-wide-mobile button-sm"
-                          onClick={handleSignin}
-                        >
-                          Iniciar sesión
-                        </Button>
-                      </li>
-                    </ul>
-                  ) : (
-                    <>
-                      <ul className="list-reset header-nav-right">
-                        {user.cod && (
-                          <li>
-                            <div className="header-nav-right-kd">
-                              <Link href="#0" onClick={closeMenu}>
-                                <CodKD kdRatio={user.cod.kdRatio} />
-                              </Link>
-                            </div>
-                          </li>
-                        )}
-                      </ul>
+                    {!user || !user.username ? (
                       <ul className="list-reset header-nav-right">
                         <li>
-                          {/* <span
+                          <Button
+                            className="button button-primary button-wide-mobile button-sm"
+                            onClick={handleSignin}
+                          >
+                            Iniciar sesión
+                          </Button>
+                        </li>
+                      </ul>
+                    ) : (
+                      <>
+                        <ul className="list-reset header-nav-right">
+                          {user.cod && (
+                            <li>
+                              <div className="header-nav-right-kd">
+                                <Link href="#0" onClick={closeMenu}>
+                                  <CodKD kdRatio={user.cod.kdRatio} />
+                                </Link>
+                              </div>
+                            </li>
+                          )}
+                        </ul>
+                        <ul className="list-reset header-nav-right">
+                          <li>
+                            {/* <span
                             className="ml-24 button button-sm magin-top-16-mobile"
                             onClick={handleLogOut}
                           >
                             Log out
                           </span> */}
-                          {/* <Link to="#0" onClick={closeMenu}>Link aux</Link> */}
-                          <Button
-                            color="ligth"
-                            size="sm"
-                            onClick={handleLogOut}
-                            wideMobile
-                          >
-                            Log out
-                          </Button>
-                        </li>
-                      </ul>
-                      <p></p>
-                    </>
-                  )}
-                </div>
-              </nav>
-            </>
-          )}
+                            {/* <Link to="#0" onClick={closeMenu}>Link aux</Link> */}
+                            <Button
+                              color="ligth"
+                              size="sm"
+                              onClick={handleLogOut}
+                              wideMobile
+                            >
+                              Log out
+                            </Button>
+                          </li>
+                        </ul>
+                        <p></p>
+                      </>
+                    )}
+                  </div>
+                </nav>
+              </>
+            )}
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </>
   );
 };
 
