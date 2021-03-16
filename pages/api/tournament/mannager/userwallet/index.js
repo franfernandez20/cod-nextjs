@@ -36,7 +36,8 @@ export default async function handler(req, res) {
         } else {
           const { uid, username, email, content } = await getDBUser(user.id);
           const wallet = content.wallet + user.wallet;
-          const newProveOfTruth = { username, email, wallet };
+          const jf = "cod_tour";
+          const newProveOfTruth = { username, email, wallet, jf };
           createUserProveOfTruth(uid, newProveOfTruth)
             .then(function () {
               updateUserWallet(user.id, wallet).then(() => {
