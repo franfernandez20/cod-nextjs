@@ -24,6 +24,8 @@ import {
   getTeamByName,
   inscribeTeam,
 } from "../../firebase/client";
+
+import * as codTournamentService from "../../services/codtournamentService";
 import UserIcon from "../../components/elements/icons/userIcon";
 
 // import {} from "../../services/codtournamentService"
@@ -173,8 +175,8 @@ const SearchTeam = ({
                   fill="none"
                   fill-rule="evenodd"
                   stroke="#5658DD"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
                   <circle cx="8.5" cy="8.5" r="5" />
                   <path d="m17.571 17.5-5.571-5.5" />
@@ -239,6 +241,10 @@ const SearchTeam = ({
   );
 };
 
+/**
+ * Modal
+ *   Metodos de pago + creacion del team + inscripcion al tour
+ */
 const Step1 = ({ onConfirm, onCancel }) => {
   return (
     <div>
@@ -270,6 +276,51 @@ const Step1 = ({ onConfirm, onCancel }) => {
           de pago
         </p>
       </Link>
+      <ButtonGroup className="mt-8">
+        <Button
+          tag="a"
+          color="primary"
+          size="sm"
+          onClick={onConfirm}
+          wideMobile
+        >
+          Confirmar
+        </Button>
+        <Button tag="a" size="sm" color="error" onClick={onCancel} wideMobile>
+          Cancelar
+        </Button>
+      </ButtonGroup>
+    </div>
+  );
+};
+
+const StepWalletPay = ({ onConfirm, onCancel, userWallet, tourPrice }) => {
+  return (
+    <div className="step-wallet-pay">
+      <p className="mt-16">
+        ¿Quieres utilizar tu saldo para inscribirte al torneo?
+      </p>
+      <div className="wallet">
+        <span className="text-color-mid">Saldo: </span>
+        <svg
+          width="100%"
+          height="100%"
+          version="1.1"
+          viewBox="0 0 20 20"
+          x="0px"
+          y="0px"
+          class="ScIconSVG-sc-1bgeryd-1 cMQeyU"
+        >
+          <path
+            fill="gray"
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M3 12l7-10 7 10-7 6-7-6zm2.678-.338L10 5.487l4.322 6.173-.85.728L10 11l-3.473 1.39-.849-.729z"
+          ></path>
+        </svg>
+        <span className="text-color-primary fw-700">{userWallet}€</span>
+      </div>
+      <h4>Inscripción: {tourPrice}€</h4>
       <ButtonGroup className="mt-8">
         <Button
           tag="a"
@@ -320,7 +371,7 @@ export default function Tournaments({
 }) {
   const [user, logOut, updateUser] = useUser();
   const [inscripcionModalActive, setInscripcionModalActive] = useState(false);
-  const [inscripcionDone, setInscripcionDone] = useState(false);
+  const [inscripcionState, setInscripcionState] = useState("TO-DO"); // DONE | NO-WALLET
   const [hasTeam, setHasTeam] = useState(false);
   const [userPay, setUserPay] = useState(false);
   const [tourState, setTourState] = useState(tourStates.PROX);
@@ -382,7 +433,7 @@ export default function Tournaments({
       user.tournaments &&
       user.tournaments.filter((e) => e.tid === tournament.id).length > 0
     ) {
-      setInscripcionDone(true);
+      setInscripcionState("DONE");
       checkUserTeam();
     }
     checkUserPay();
@@ -391,7 +442,7 @@ export default function Tournaments({
 
   useEffect(() => {
     checkUserPay();
-  }, [tournament]);
+  }, [tournament, user]);
 
   const handleInscripcion = (e) => {
     e.preventDefault();
@@ -401,10 +452,11 @@ export default function Tournaments({
   const closeInscripcionModal = (e) => {
     e.preventDefault();
     setInscripcionModalActive(false);
+    // setInscripcionState("TO-DO");
     setHasTeam(false);
   };
 
-  const handleConfirm = (e) => {
+  const handleConfirm = (withWallet = false) => (e) => {
     console.log("Confirm");
     e.preventDefault();
     inscribeUserToTournament(user.id, tournament)
@@ -420,11 +472,23 @@ export default function Tournaments({
           .catch((e) => console.log("error$$$", e));
         const tours = [
           ...user.tournaments,
-          { tid: tournament.id, payed: false },
+          { tid: tournament.id, payed: withWallet },
         ];
         const newuser = { ...user, tournaments: tours };
+        if (withWallet) {
+          console.log("Actualizar wallet del user");
+          const newWallet = newuser.content.wallet - Math.abs(tournament.prize);
+          newuser.content.wallet = newWallet;
+          codTournamentService
+            .setUserPay(user.uid, tournament.id)
+            .then(() => {
+              console.log("Success");
+              setInscripcionState("DONE");
+            })
+            .catch((e) => console.log("ERROR ->", e));
+        }
         updateUser(newuser);
-        setInscripcionDone(true);
+        setInscripcionState("DONE");
       })
       .catch((e) => console.log("error", e));
   };
@@ -447,7 +511,7 @@ export default function Tournaments({
       inscribeTeam(newTeam);
       setUserTeam({});
     }
-    setInscripcionDone(false);
+    setInscripcionState("TO-DO");
     dispatch({ type: "tournament-deleteUser", value: user.id });
     router.push("/");
   };
@@ -475,8 +539,23 @@ export default function Tournaments({
         />
       );
     } else {
-      if (!inscripcionDone)
-        return <Step1 onConfirm={handleConfirm} onCancel={handleCancel} />;
+      if (inscripcionState !== "DONE")
+        if (
+          inscripcionState !== "NO-WALLET" &&
+          user &&
+          user.content &&
+          user.content.wallet >= tournament.prize
+        )
+          return (
+            <StepWalletPay
+              onConfirm={handleConfirm(true)}
+              // onConfirm={handlePayWithWallet(true)}
+              onCancel={() => setInscripcionState("NO-WALLET")}
+              userWallet={user.content.wallet}
+              tourPrice={tournament.prize}
+            />
+          );
+        else return <Step1 onConfirm={handleConfirm(false)} onCancel={handleCancel} />;
       else return <StepFinal />;
     }
   };
@@ -548,7 +627,7 @@ export default function Tournaments({
                   </span>
                 </h3>
                 <div className="container-xs">
-                  {inscripcionDone ? (
+                  {inscripcionState === "DONE" ? (
                     <>
                       {userTeam && userTeam.users && (
                         <ul
@@ -572,7 +651,7 @@ export default function Tournaments({
                       )}
                       {userTeam && userTeam.payed ? (
                         <>
-                          <p className="mb-0">Recibimos el pago </p>
+                          <p className="mb-0">Team: Pago confirmado </p>
                           <h4 className="mt-0">
                             ¡Ya estaís inscritos al torneo 😁!
                           </h4>
@@ -595,12 +674,12 @@ export default function Tournaments({
                           </div>
                           <div className="metodo-pago">
                             <p className="text-sm mb-0 text-color-mid">
-                              Solo os queda realizar el Pago
+                              Solo os queda realizar/validar el Pago
                             </p>
                             <p className="text-sm mt-0 mb-0 text-color-mid ta-l ml-32">
-                              ➡ BIZUM
+                              ➡ BIZUM : 
                               <span className="text-xxs text-color-high">
-                                660 73 30 25 | 690 13 87 77
+                                 {" "}660 73 30 25 | 690 13 87 77
                               </span>
                             </p>
                             <p className="text-sm mt-0 mb-0 text-color-mid ta-l ml-32">
@@ -618,7 +697,7 @@ export default function Tournaments({
                         </>
                       )}
                       <h4 className="mt-8 text-color-low">
-                        Pago confirmado:
+                        Usuario: Pago confirmado
                         {userPay ? (
                           <CheckOk color="#24E5AF" />
                         ) : (

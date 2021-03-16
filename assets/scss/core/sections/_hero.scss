@@ -263,6 +263,20 @@
 			}
 		}
 	}
+
+	// Modal inscripcion
+	.step-wallet-pay {
+		.wallet {
+			display: inline-flex;
+		}
+		
+		svg {
+			margin-right: 0;
+			margin-left: 0;
+			height: 30px;
+    		width: 30px;
+		}
+	}
 }
 
 
