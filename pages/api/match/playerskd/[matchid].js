@@ -1,11 +1,33 @@
 import { XSRF_TOKEN } from "../../../../lib/api";
+const api_url = "http://localhost:3000/api/";
+
+const getPlayerKD = async (username) => {
+  console.log('getPlayerKD')
+  let results = await fetch(`${api_url}user/search/${username}?platform=psn`)
+  if (results.length === 0) results = await fetch(`${api_url}user/search/${username}?platform=uno`)
+  if (results.length > 0) {
+    const gameid = results[0].username
+    console.log('gameid', gameid)
+    const platform = results[0].platform
+    console.log('platform', platform)
+    const stats = await fetch(`${api_url}user/userstats/${encodeURIComponent(gameid)}?platform=${platform}`)
+    if (stats.status === 'success') {
+      console.log('SUCCESS -->', wz.br_all.properties.kdRatio)
+      return wz.br_all.properties.kdRatio
+    } else {
+      console.log('ERROR 2')
+    }
+  } else {
+    console.log('ERROR 1')
+  }
+}
+
 
 export default function handler(req, res) {
   const {
-    query: { userid, platform, ini, fin },
+    query: { matchid },
   } = req;
-
-  if (!platform) return res.end("Error - platform es necesario");
+  console.log('matchid', matchid)
 
   var myHeaders = new Headers();
   myHeaders.append(
@@ -19,73 +41,27 @@ export default function handler(req, res) {
     redirect: "follow",
   };
 
-  const inisec = ini / 1000;
-  const finsec = fin / 1000;
-  const encodeduser = encodeURIComponent(userid);
   fetch(
     // `https://my.callofduty.com/api/papi-client/stats/cod/v1/title/mw/platform/psn/gamer/${userid}/profile/type/wz`,
-    // `https://my.callofduty.com/api/papi-client/stats/cod/v1/title/mw/platform/${platform}/gamer/${encodeduser}/profile/type/wz`,
-    // `https://my.callofduty.com/api/papi-client/crm/cod/v1/title/mw/platform/${platform}/gamer/${encodeduser}/matches/mp/start/0/end/0/details`,
-    `https://my.callofduty.com/api/papi-client/crm/cod/v2/title/mw/platform/${platform}/gamer/${encodeduser}/matches/wz/start/0/end/0/details`,
+    `https://my.callofduty.com/api/papi-client/crm/cod/v2/title/mw/platform/psn/fullMatch/wz/${matchid}/es`,
     requestOptions
   )
     .then((response) => response.json())
-    .then((result) => {
-      const { status, data } = result;
-      if (status === "success") {
-        res.setHeader('Content-Type', 'application/json')
-        // const matchesOnRange = data.matches.filter(
-        //   (match) => match.utcStartSeconds > ini && match.utcStartSeconds < fin
-        // );
-        const parsedMatches = data.matches.reduce((res, match) => {
-          // if (match.utcStartSeconds > inisec && match.utcStartSeconds < finsec) {
-            const {
-              utcStartSeconds,
-              utcEndSeconds,
-              map,
-              mode,
-              matchID,
-              privateMatch,
-            } = match;
-            const {
-              kills,
-              deaths,
-              kdRatio,
-              gulagDeaths,
-              gulagKills,
-              teamPlacement,
-              damageDone,
-              damageTaken,
-            } = match.playerStats;
-            const { team, username, uno } = match.player;
-            res = [
-              ...res,
-              {
-                utcStartSeconds,
-                utcEndSeconds,
-                map,
-                mode,
-                matchID,
-                privateMatch,
-                kills,
-                deaths,
-                kdRatio,
-                gulagDeaths,
-                gulagKills,
-                teamPlacement,
-                damageDone,
-                damageTaken,
-                team,
-                username,
-                uno,
-              },
-            ];
-          // }
-          return res;
-        }, []);
-        res.end(JSON.stringify({ status, data: parsedMatches }));
-      }
-      res.end(JSON.stringify({ status, message: data.message }));
+    .then(({status, data}) => {
+      if (status !== "success") res.end("Error al recuperar fullMatch");
+      const aa = data
+      // res.end(JSON.stringify(aa.allPlayers[0]))
+      const allPlayersTest = data.allPlayers.slice(0,10)
+      // res.end(JSON.stringify(allPlayersTest))
+      const promises = allPlayersTest.map(({ player }) => getPlayerKD(player.username));
+      console.log('promises', promises)
+      
+      
+      Promise.all(promises).then(result => {
+        console.log('result', result)
+        
+      })
+      console.log("--->", result);
     })
     .catch((error) => res.end(JSON.stringify(error)));
 }

@@ -20,14 +20,14 @@
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     transition: border 0.5s;
-    border-bottom: 5px solid rgba(#5658DD, 0.2);
+    border-bottom: 5px solid rgba(#5658dd, 0.2);
     padding: 3px 2px;
     &:hover {
-        border-bottom-color: #5658DD;
+      border-bottom-color: #5658dd;
     }
-}
+  }
 
-label.nav {
+  label.nav {
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -35,7 +35,7 @@ label.nav {
     border-bottom: 2px solid #ffffff;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
-    background: #5658DD;
+    background: #5658dd;
     user-select: none;
     transition: background 0.5s, padding-left 0.4s;
     padding-left: 0;
@@ -53,3 +53,75 @@ label.nav {
     }
   }
 }
+
+
+// Wallet element
+
+// .wallet {
+  .header-nav-wallet {
+    display: inline-flex;
+    position: relative;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    -webkit-box-align: center;
+    align-items: center;
+    -webkit-box-pack: center;
+    justify-content: center;
+    vertical-align: middle;
+    overflow: hidden;
+    text-decoration: none;
+    white-space: nowrap;
+    user-select: none;
+    margin-left: 15px;
+    font-weight: 500;
+    border-radius: 10px;
+    // font-size: var(--button-text-default);
+    // height: var(--button-size-default);
+    background-color: rgba(38, 38, 38, 0.796);
+    color: #5658dd;
+
+    .wallet-content {
+      display: flex;
+      -webkit-box-align: center;
+      align-items: center;
+      -webkit-box-flex: 0;
+      flex-grow: 0;
+      padding: 0px 4px 4px 0px;
+
+      svg {
+        height: 30px;
+        width: 30px;
+      }
+    }
+  }
+
+  .header-nav-wallet:hover {
+    background-color: rgba(79, 79, 79, 0.603);
+    cursor: pointer;
+  }
+
+  @include media("<=medium") {
+    .header-nav-wallet {
+      margin-left: 0px;
+
+      .wallet-content {
+        display: flex;
+        -webkit-box-align: center;
+        align-items: center;
+        -webkit-box-flex: 0;
+        flex-grow: 0;
+        padding: 0px 2px 2px 0px;
+
+        svg {
+          // left: 0px;
+          // width: 100%;
+          // min-height: 100%;
+          // top: 0px;
+        }
+        span {
+          font-size: 15px;
+        }
+      }
+    }
+  }
+// }

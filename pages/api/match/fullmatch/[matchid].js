@@ -24,8 +24,10 @@ export default function handler(req, res) {
   )
     .then((response) => response.json())
     .then((result) => {
-      console.log("--->", result);
+      // console.log("--->", result);
+      res.setHeader('Content-Type', 'application/json')
       res.end(JSON.stringify(result))
+      // res.end(result)
      
     })
     .catch((error) => res.end(JSON.stringify(error)));

@@ -9,10 +9,16 @@ export default function handler(req, res) {
     console.log("tour", tour);
     tour.fecha = new Date(tour.fecha);
     console.log("fecha", tour);
-    createTournament(tour).then(() => {
-      res.statusCode = 200;
-      res.end("Torneo guardado correctamente");
-    });
+    tour.jf = "cod_tour";
+    createTournament(tour)
+      .then(() => {
+        res.statusCode = 200;
+        res.end("Torneo guardado correctamente");
+      })
+      .catch((e) => {
+        console.log("DB error --> ", e);
+        res.status(405).end();
+      });
   } else res.status(405).end();
   //   res.setHeader('Content-Type', 'application/json');
   // res.json(error);

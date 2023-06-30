@@ -26,9 +26,7 @@ export default function handler(req, res) {
   )
     .then((response) => response.json())
     .then((result) => {
-      console.log("result", result);
       const { status, data } = result;
-      console.log("status", status);
       if (status === "success") {
         res.statusCode = 200;
         res.setHeader("Content-Type", "application/json");

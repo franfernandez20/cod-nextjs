@@ -36,7 +36,7 @@
 			.psn-icon {
 				height: 1.5rem;
 				width: 1.5rem;
-				margin-right: .75rem;
+				margin-right: .20rem;
 				fill: #FFFFFF
 			}
 		}
@@ -45,7 +45,7 @@
 		p {
 			margin-left: 0px;
 			margin-top: 0;
-			margin-right: 16px;
+			margin-right: 5px;
 			margin-bottom: 0;
 			text-align: left;
 		}
@@ -124,49 +124,6 @@
 	background-color: #30303021;
 }
 
-.header-nav-wallet {
-	display: inline-flex;
-	position: relative;
-	margin-top: 10px;
-	margin-bottom: 10px;
-	-webkit-box-align: center;
-	align-items: center;
-	-webkit-box-pack: center;
-	justify-content: center;
-	vertical-align: middle;
-	overflow: hidden;
-	text-decoration: none;
-	white-space: nowrap;
-	user-select: none;
-	margin-left: 15px;
-	font-weight: 500;
-	border-radius: 10px;
-	// font-size: var(--button-text-default);
-	// height: var(--button-size-default);
-	background-color: rgba(38, 38, 38, 0.796);
-	color: #5658DD;
-	
-	.wallet-content {
-		display: flex;
-		-webkit-box-align: center;
-		align-items: center;
-		-webkit-box-flex: 0;
-		flex-grow: 0;
-		padding: 0px 4px 4px 0px;
-		
-		
-		svg {
-			height: 30px;
-    		width: 30px;
-		}
-	}
-}
-
-.header-nav-wallet:hover {
-	background-color: rgba(79, 79, 79, 0.603);
-	cursor: pointer;
-}
-
 @include media( '<=medium' ) {
 
 	.header-nav-links {
@@ -193,27 +150,6 @@
 
 	.header-nav-kd {
 		display: none;
-	}
-
-	.header-nav-wallet {
-		margin-left: 0px;
-
-		.wallet-content {
-			display: flex;
-			-webkit-box-align: center;
-			align-items: center;
-			-webkit-box-flex: 0;
-			flex-grow: 0;
-			padding: 0px 4px 4px 0px;
-			
-
-			svg {
-				// left: 0px;
-				// width: 100%;
-				// min-height: 100%;
-				// top: 0px;
-			}
-		}
 	}
 
 	.header-nav-toggle {

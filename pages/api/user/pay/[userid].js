@@ -7,8 +7,8 @@ import {
 } from "../../../../firebase/client";
 
 // OJITO AL SUBIR --- ENV YA !! mirar tb que en pro id?tourid en vez de /tourid ¿? 
-// const BASE_URL = "http://localhost:3000/";
-const BASE_URL = "https://cod-nextjs.vercel.app/";
+const BASE_URL = "http://localhost:3000/";
+// const BASE_URL = "https://cod-nextjs.vercel.app/";
 
 export default async function handler(req, res) {
   const {

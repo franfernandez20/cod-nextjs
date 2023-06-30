@@ -76,7 +76,7 @@ const firebaseConfig3 = {
   appId: "1:850305239056:web:a78958b077a3417a396295",
 };
 
-!firebase.apps.length && firebase.initializeApp(firebaseConfig);
+!firebase.apps.length && firebase.initializeApp(firebaseConfig3);
 
 const dbService = firebase.firestore();
 
